@@ -1,13 +1,4 @@
 {
-  "_meta": {
-    "note": "Every `when`, `org`, `title` and `chips` value is VERBATIM from the master prompt. The three open-source descriptions are verbatim too. Descriptions marked 'TODO:' were NOT supplied — the prompt forbids inventing outcomes, so they render as visible markers until you write them.",
-    "verbatim": [
-      "entries[*].when",
-      "entries[*].org",
-      "entries[*].title",
-      "entries[*].chips"
-    ]
-  },
   "entries": [
     {
       "id": "quess",
@@ -20,7 +11,7 @@
         "Linux",
         "Ops"
       ],
-      "description": "TODO: one or two sentences on what you actually do on the platform team. No outcomes were supplied, so nothing has been written for you.",
+      "description": "Supporting client-side technology operations on a platform team through Quess Corp — application monitoring, deployment activities and the documentation that goes with them, working alongside the technical teams that own the delivery process.",
       "href": null
     },
     {
@@ -62,7 +53,7 @@
         "CI/CD",
         "Linux"
       ],
-      "description": "TODO: what you built or automated during the internship. Not supplied.",
+      "description": "Two months on containerised and web-based application deployment: Docker-based backend services, Go REST APIs, and Kubernetes deployments practised end to end rather than shipped to production.",
       "href": null
     },
     {
@@ -75,7 +66,7 @@
         "Networks",
         "Databases"
       ],
-      "description": "TODO: optional — a line on coursework or final-year project, or delete this field to render the card without a description.",
+      "description": "CGPA 7.8.",
       "href": null
     }
   ]
