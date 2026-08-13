@@ -1,9 +1,4 @@
 {
-  "_meta": {
-    "note": "`summary` is VERBATIM from the master prompt. The endpoint and layer chapters carry over the drafted prose from the previous build — still drafted, still yours to correct. Text inside backticks renders in mono.",
-    "drafted": ["chapters[*].paragraphs", "chapters[*].tradeoff"]
-  },
-
   "title": "Book Inventory REST API",
   "kicker": "Open source · 2025",
   "summary": "A deliberately small Go service, used to check whether a new idea about testing, tracing or deployment survives contact with something real.",
@@ -13,36 +8,38 @@
 
   "metrics": [
     { "id": "endpoints", "value": "5", "unit": "", "label": "endpoints" },
-    { "id": "layers", "value": "4", "unit": "", "label": "layers" }
+    { "id": "packages", "value": "4", "unit": "", "label": "packages" }
   ],
 
   "chapters": [
     {
-      "id": "why",
-      "title": "Why it is this small",
-      "paragraphs": [
-        "Five endpoints over one resource is barely a service. That was the point — a domain small enough that nothing in it can hide a structural mistake. If the layering is wrong here, it is obviously wrong, because there is no complexity to blame it on.",
-        "The rule enforced throughout is that dependencies point inward and types do not leak outward. The service layer defines the repository interface it needs; the storage package implements it. A handler cannot reach a database connection because it has never been handed one, and the service cannot see an HTTP status code because none is in scope."
-      ],
-      "tradeoff": "A service this small cannot tell you whether the structure survives growth. Four layers over five endpoints is more ceremony than the domain needs, and the honest answer is that the layering is being rehearsed here rather than earned."
-    },
-    {
       "id": "surface",
       "title": "The surface",
       "paragraphs": [
-        "`GET /books` lists with pagination. `GET /books/{id}` fetches one. `POST /books` creates, validated. `PUT /books/{id}` replaces. `DELETE /books/{id}` removes. That is the whole API.",
-        "The four layers are `transport` (HTTP handlers — decode, validate shape, map errors to status codes, and nothing about storage), `service` (business rules and the only place they live, taking and returning domain types and never an `http.Request`), `repository` (an interface owned by the service layer and implemented below it), and `storage` (the concrete driver and the queries — the only file that knows what a row looks like)."
+        "Five endpoints over one resource, all under `/api/v1/books`. `GET /books` lists, `GET /books/{id}` fetches one, `POST /books` creates, `PUT /books/{id}` updates, `DELETE /books/{id}` removes. A book is five fields — id, title, author, publisher, quantity. That is the whole API.",
+        "Gin handles routing, GORM handles Postgres, and the credentials come out of the environment through dotenv rather than out of the source. There is no pagination on the list endpoint: it returns every row. At this size that is fine, and it is the first thing that would have to change if it were not."
       ],
-      "tradeoff": "Replacing the store means implementing one interface, which is the payoff. It also means every query lives behind an abstraction that hides what the database is actually doing, which is the cost."
+      "tradeoff": "An unpaginated list endpoint is a latent problem, not a current one. It is correct until the table is large enough to matter, and there is nothing in the code that will tell me when that happens."
     },
     {
-      "id": "errors",
-      "title": "Errors that survive the trip",
+      "id": "structure",
+      "title": "Four packages, not four layers",
       "paragraphs": [
-        "The layer that knows a book was not found is the repository. The layer that knows that means `404` is the transport. Getting an error between those two without either one learning the other's vocabulary is most of what this project is actually about.",
-        "Sentinel errors are declared in the domain package and wrapped on the way up with `fmt.Errorf` and `%w`. Transport unwraps with `errors.Is` and maps to a status code in exactly one place. There is no `if err.Error() == \"not found\"` anywhere, which is the failure mode this structure exists to prevent."
+        "The code is split across four packages — `routes`, `controllers`, `models`, `database`. That is a real separation and it is worth having, but it is not a layered architecture and I want to be precise about the difference, because the two get conflated constantly.",
+        "In a layered design the service layer would declare the interface it needs and the storage layer would implement it, so the dependency points inward and either side can be replaced. That is not what this is. The controllers import `database` directly and call `database.DB` on it. There is no interface between them, no service layer, and no way to swap the store without editing every handler.",
+        "For five endpoints over one table, that is the right call. An interface with exactly one implementation is indirection with no payoff — it costs a file, a mock and a layer of naming, and buys the ability to do something I have no plan to do. The structure earns its place when there is a second implementation or a second consumer, and here there is neither."
       ],
-      "tradeoff": "Sentinel errors couple the layers to a shared vocabulary. Add enough of them and the domain package becomes a dumping ground that every layer imports — which is the thing the layering was supposed to prevent."
+      "tradeoff": "This is the choice that stops scaling first. The moment there is business logic worth testing without a database, the handlers are the wrong place for it and every one of them has to be opened. I would rather pay that later than pay for a layer I am not using now — but it is deferred cost, not avoided cost."
+    },
+    {
+      "id": "schema",
+      "title": "AutoMigrate, and when it stops being fine",
+      "paragraphs": [
+        "The schema is not in migration files. `database.Connect` calls `db.AutoMigrate(&models.Book{})` on startup, and GORM reconciles the table against the struct — adding columns and indexes to match whatever the Go type currently says.",
+        "For a single-developer project with one table this is genuinely good. The struct is the schema, there is no second place to update, and the two cannot drift apart because one of them is derived from the other.",
+        "It is also the thing I would replace first on anything with a second developer or a production database. AutoMigrate adds; it does not drop columns, it does not rename, and it does not roll back. It runs on every boot, which means the schema changes at deploy time rather than at a moment anyone chose. And because there are no migration files, there is no record of what the schema looked like last month — the history exists only in the git history of the struct."
+      ],
+      "tradeoff": "A schema with no migration history is a schema you cannot reason about backwards. I traded reviewability for the fact that there is nothing to keep in sync, which is the right trade at one table and the wrong one at ten."
     }
   ]
 }
