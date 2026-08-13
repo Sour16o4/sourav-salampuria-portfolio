@@ -1,92 +1,26 @@
 {
-  "_meta": {
-    "note": "CARRIED OVER from the previous build — this is the prose you have been fact-checking, preserved intact. `summary` is now VERBATIM from the master prompt. ALL chapter prose and tradeoffs are still DRAFTED; see CHAPTER-FACTS.md. Text inside backticks renders in mono.",
-    "drafted": [
-      "chapters[*].paragraphs",
-      "chapters[*].tradeoff",
-      "differently.items"
-    ],
-    "warning": "The master prompt describes this project as a multi-node KIND cluster with HPA, ServiceMonitor, kubeconform and Loki/Promtail. The carried-over chapters describe a bare-metal-ish 3-node cluster with pinned ingress and a CI write-back loop. Chapters 1 and 4 in particular may no longer describe the project as it now is. Reconcile before publishing.",
-    "metricsWarning": "These four figures came from the earlier brief and are NOT in the master prompt. Confirm they still hold for the KIND-based platform, or delete them."
-  },
   "title": "GitOps & Observability Platform",
   "kicker": "Open source · 2026",
   "summary": "A multi-node KIND cluster that reconciles itself from git: Go microservice with Prometheus RED metrics in a minimal non-root image, parameterised Helm chart with HPA and ServiceMonitor, GitHub Actions gating on kubeconform, Helm lint and GHCR publishing, Argo CD with self-healing, and Grafana fed by kube-prometheus-stack plus Loki/Promtail.",
   "sourceKey": "platformSource",
   "sourceLabel": "Source on GitHub →",
-  "metrics": [
-    {
-      "id": "image",
-      "value": "6.45",
-      "unit": "MB",
-      "label": "image size"
-    },
-    {
-      "id": "nodes",
-      "value": "3",
-      "unit": "",
-      "label": "cluster nodes"
-    },
-    {
-      "id": "uid",
-      "value": "10001",
-      "unit": "",
-      "label": "runtime UID"
-    },
-    {
-      "id": "endpoints",
-      "value": "5",
-      "unit": "",
-      "label": "endpoints"
-    }
-  ],
   "chapters": [
-    {
-      "id": "ingress",
-      "title": "Pinning ingress to the control plane",
-      "paragraphs": [
-        "The cluster is three nodes and there is no cloud load balancer in front of it. That means the ingress controller's address is whatever node the controller pod happens to land on, and every time it is rescheduled, that address changes. DNS pointing at a node that no longer runs ingress is a broken site with a healthy-looking cluster behind it.",
-        "The fix was to stop treating the ingress controller as a normal workload. It gets a node selector that pins it to the control-plane node, plus a toleration for the control-plane taint so the scheduler will actually place it there. The control-plane node is the one node whose identity is stable — it is not part of the pool I would scale or replace casually — so pinning to it makes the ingress address a fixed fact that DNS can point at.",
-        "This is the kind of decision that looks like a shortcut and is really a scope choice. A managed load balancer solves it properly. On a cluster this size, a managed load balancer costs more per month than the rest of the infrastructure combined, to solve a problem that one node selector solves."
-      ],
-      "tradeoff": "A predictable ingress address, bought with a workload running on the control plane. If ingress traffic ever saturates that node, it competes with the API server, and the failure mode is the whole cluster becoming hard to talk to rather than one service getting slow. Acceptable at three nodes and this traffic level; the first thing I would undo on a cluster that mattered more."
-    },
-    {
-      "id": "image",
-      "title": "6.45 MB, non-root, read-only rootfs",
-      "paragraphs": [
-        "The runtime image is a scratch base with a statically linked Go binary and nothing else — no shell, no package manager, no libc. It runs as UID 10001, a non-root user with no login and no home directory, with the root filesystem mounted read-only and all Linux capabilities dropped.",
-        "The size is a side effect rather than the goal. What the constraint actually buys is that the attack surface is enumerable: there is no `sh` to spawn, no `curl` to pull a second stage, and nowhere on disk a process can write. A container that cannot execute anything other than the one binary it shipped with is a meaningfully smaller problem than one with a Debian userland sitting behind it.",
-        "The cost is paid at debug time. `kubectl exec` into this container gives you nothing, because there is no shell to give. Anything you want to know has to come out through logs, metrics, or an ephemeral debug container attached to the same process namespace. That changes how you instrument — you add the log line before you need it, because you cannot go in afterwards and look around."
-      ],
-      "tradeoff": "Debuggability. A distroless or Alpine base would have cost a few megabytes and kept a shell available for the times something is wrong and the metrics do not explain it. I gave that up deliberately, and the price is that every unexplained behaviour turns into a code change and a redeploy rather than a look around inside the running container."
-    },
     {
       "id": "monitoring",
       "title": "Monitoring ships with the chart",
       "paragraphs": [
-        "The Helm chart does not stop at Deployment, Service, and Ingress. It also renders a `ServiceMonitor` so Prometheus discovers the target without anyone editing scrape config, and a Grafana dashboard as a ConfigMap with the sidecar label, so the dashboard appears the moment the release is installed.",
+        "The Helm chart does not stop at Deployment, Service, and Ingress. It also renders a `ServiceMonitor` so Prometheus discovers the target without anyone editing scrape config, alongside an HPA, a PodDisruptionBudget, a NetworkPolicy and a PrometheusRule. The Grafana dashboard ships beside it as a ConfigMap carrying the sidecar label, so the dashboard appears the moment the stack is installed.",
         "The reason is that observability added later is observability that does not exist. If the dashboard is a separate step, it stays a separate step: the service goes to production, the ticket to add monitoring gets written, and it sits in the backlog until the first incident makes it urgent. Putting it in the chart means the only way to deploy the service is to deploy it observed.",
         "It also makes the dashboard versioned with the code that emits the metrics. When a metric is renamed, the panel that reads it changes in the same commit and ships in the same release, instead of the dashboard quietly showing a flat line for a week."
       ],
       "tradeoff": "Chart complexity. The chart is meaningfully larger than the workload strictly requires, it carries a hard assumption that Prometheus Operator and the Grafana sidecar are installed in the cluster, and installing it anywhere without them produces resources nothing reads. I took a chart that is harder to reuse over a service that can be deployed unobserved."
     },
     {
-      "id": "writeback",
-      "title": "The write-back loop",
-      "paragraphs": [
-        "The pipeline builds an image, tags it with the commit SHA, pushes it to GHCR, and then has to tell the cluster which tag to run. In a GitOps model the cluster only reads from Git, so CI has to commit the new tag into `values.yaml` and push it back to the same repository it was triggered by.",
-        "Done naively, that is an infinite loop. The push from CI is a push like any other, the workflow triggers on push, and the pipeline builds again — new SHA, new tag, new commit, forever. It is a genuinely expensive mistake, because each iteration is a full image build.",
-        "The loop is cut at the trigger rather than inside the job. The workflow declares a `paths-ignore` for the values file the write-back touches, so a commit that only changes the deployed tag does not match the trigger at all. The bot commit is also marked in the message, and the job checks the author before doing anything, as a second line of defence in case the path filter is ever loosened. Cutting it at the trigger matters more than cutting it in the job — a job that starts and then exits early has still consumed a runner and still shows up as a run."
-      ],
-      "tradeoff": "The `paths-ignore` filter is a blunt instrument: a real, human change to that same values file will not trigger the pipeline either, which is surprising the first time it happens. The alternative — a separate deployment repository, so config commits and code commits cannot collide — is the correct shape, and costs one more repository to keep in sync."
-    },
-    {
       "id": "trivy",
       "title": "Trivy gating",
       "paragraphs": [
-        "Trivy runs against the built image before it is pushed, and the job fails on HIGH or CRITICAL. Failing means the image never reaches the registry, so a vulnerable tag is never something ArgoCD could pull even by accident.",
-        "The severity line is where the judgement is. Gating on everything, MEDIUM and LOW included, produces a pipeline that is red most mornings for findings nobody is going to act on, and a red pipeline that is normal is the same as no pipeline. Gating on HIGH and CRITICAL keeps the signal high enough that a failure is worth reading.",
+        "Trivy runs against the built image before it is pushed, and the job fails on CRITICAL. Failing means the image never reaches the registry, so a vulnerable tag is never something ArgoCD could pull even by accident.",
+        "The severity line is where the judgement is. Gating on everything, MEDIUM and LOW included, produces a pipeline that is red most mornings for findings nobody is going to act on, and a red pipeline that is normal is the same as no pipeline. Gating on CRITICAL alone keeps the signal high enough that a failure is worth reading — and leaves HIGH findings visible but non-blocking, which is a narrower net than I would want on a service handling real traffic.",
         "There is a second, quieter decision: unfixed vulnerabilities are ignored. A HIGH with no patched version available is not something a build can fix, and blocking on it means blocking every deploy until an upstream maintainer acts. Those are surfaced in the scan output but do not fail the job. The rule I settled on is that the gate blocks what a rebuild can fix, and everything else is information rather than a stop."
       ],
       "tradeoff": "Ignoring unfixed findings is a real hole — a critical vulnerability with no patch is still a critical vulnerability, and my pipeline will happily ship it. I accepted that because the alternative is a gate that gets disabled the first week it blocks something urgent, and a gate that is switched off protects nothing at all."
@@ -105,10 +39,10 @@
   "differently": {
     "title": "What I'd do differently",
     "items": [
-      "Split the deployment configuration into its own repository. The `paths-ignore` filter works, but it is a workaround for having put application code and deployed state in the same place. Two repositories make the write-back loop impossible rather than merely prevented.",
+      "Split the deployment configuration into its own repository. CI commits the new image tag back into the same repository that triggered it, and the only thing stopping an infinite build loop is `[skip ci]` in the commit message. That is a convention holding back a structural problem — two repositories make the loop impossible rather than merely discouraged.",
       "Sign the images and verify the signature at admission. Right now the cluster trusts any tag that reaches GHCR under the right name. Cosign plus a policy controller would close the gap between 'my pipeline built this' and 'the cluster will run this'.",
-      "Put the Helm chart under test. It is rendered and applied, but never asserted on — there is no check that the ServiceMonitor selector still matches the Service labels after a refactor. That is the kind of break that shows up as a silently missing dashboard weeks later.",
-      "Decide about the ingress pin properly rather than by cost. Pinning to the control plane was the right call for this cluster and I would make it again, but I never wrote down the traffic level at which it stops being right, which means nobody — including me — knows when to revisit it."
+      "Put the Helm chart under test. It is rendered and validated with kubeconform and helm lint, but never asserted on — there is no check that the ServiceMonitor selector still matches the Service labels after a refactor. That is the kind of break that shows up as a silently missing dashboard weeks later.",
+      "Write down why the Trivy gate stops at CRITICAL. Gating on CRITICAL and ignoring unfixed findings were both deliberate, and both are defensible on a cluster nobody depends on. I never recorded the point at which that stops being true, which means nobody — including me — knows when to tighten it."
     ]
   }
 }
