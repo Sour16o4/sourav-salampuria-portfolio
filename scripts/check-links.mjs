@@ -4,8 +4,9 @@
  *
  *   npm run check:links
  *
- * Zero dependencies. LinkedIn returns 999 to non-browser clients, which is not
- * a broken link — it is reported separately rather than counted as a failure.
+ * Zero dependencies. LinkedIn returns 999 or 429 to non-browser clients,
+ * which is not a broken link — it is reported separately rather than
+ * counted as a failure.
  */
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -55,8 +56,8 @@ for (const [path, url] of targets) {
   if (result.error) {
     console.log(`${label}\n      → ${result.error}`);
     failures.push(`${path}: ${url} — ${result.error}`);
-  } else if (result.status === 999) {
-    console.log(`${label}\n      → 999 (LinkedIn blocks non-browser clients; open it manually)`);
+  } else if (result.status === 999 || result.status === 429) {
+    console.log(`${label}\n      → ${result.status} (LinkedIn blocks non-browser clients; open it manually)`);
     warnings.push(`${path}: could not be verified automatically — open ${url} in a browser.`);
   } else if (result.status >= 400) {
     console.log(`${label}\n      → ${result.status}`);
