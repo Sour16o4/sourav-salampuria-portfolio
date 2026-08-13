@@ -117,7 +117,7 @@ testing nothing.
 
 - No horizontal scroll at 320 / 375 / 480 / 700 / 768 / 1024 / 1280 / 1440 on all six routes, after a full scroll pass, with a clean console at each
 - Every `[data-reveal]` reaches opacity 1 on all five routes at three widths
-- Timeline is an `<ol>`, all 6 entries, all 6 node dots activate, spine draws with scroll
+- Timeline is an `<ol>`, all 5 entries, all 5 node dots activate, spine draws with scroll
 - Counters sit at exactly zero off-screen and land on `0.23 / 8.2 / 93.3 / 9.44`
 - Parallax off below 480, active above, travel within the 60px cap
 - Terminal: typewriter completes with no character left hidden; `help`, `ls`, `whoami`, unknown-command and `clear` all work; **panel height is byte-identical before and after output** (zero CLS)
@@ -180,7 +180,7 @@ Mobile `/` sat at 85–91 until these, each verified by measurement rather than 
 src/
   app/            routes; three loading.js skeletons, icon.svg, sitemap, robots
   components/     Server Components by default; "use client" only where motion or state needs it
-  content/        all copy as JSON — every file carries a _meta block
+  content/        all copy as JSON, one file per route plus site.json and timeline.json
   lib/            gsap.js (loader) · motion.js (vocabulary + gates) · stops.js (green full stops)
                   rich.js (backtick → mono) · todo.js (visible TODO markers)
 scripts/
