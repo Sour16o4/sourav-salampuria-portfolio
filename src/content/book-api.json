@@ -1,7 +1,7 @@
 {
   "title": "Book Inventory REST API",
   "kicker": "Open source · 2025",
-  "summary": "A deliberately small Go service, used to check whether a new idea about testing, tracing or deployment survives contact with something real.",
+  "summary": "A small Go REST API over a single resource: five endpoints, Gin for routing, GORM over Postgres, and configuration read from the environment. Deliberately minimal — the smallest thing that is still a real service.",
 
   "sourceKey": "bookApiSource",
   "sourceLabel": "Source on GitHub →",

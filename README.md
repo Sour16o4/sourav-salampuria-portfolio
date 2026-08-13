@@ -4,8 +4,8 @@ Next.js App Router · JavaScript · Tailwind CSS v4 · GSAP + ScrollTrigger · F
 anime.js · lucide-react. No CMS, no database, no backend — content is local JSON. Every
 route is statically prerendered.
 
-**Read [NEEDS-CONTENT.md](NEEDS-CONTENT.md) first.** Several fields render as visible amber
-`TODO` markers and must be replaced before this goes out.
+**Read [NEEDS-CONTENT.md](NEEDS-CONTENT.md) first.** It covers deployment and the couple of
+things a script cannot check.
 
 ```bash
 npm install
@@ -14,7 +14,7 @@ npm run build
 npm start
 
 npm run lint           # ESLint CLI, next/core-web-vitals
-npm run verify         # 210 behavioural checks in real Chrome
+npm run verify         # 211 behavioural checks in real Chrome
 npm run verify:motion  # only the motion suites
 npm run check          # external links in site.json
 ```
@@ -37,7 +37,7 @@ Each library has exactly one job. These never blur.
 
 | Library | Owns |
 |---|---|
-| **GSAP + ScrollTrigger** | Everything scroll-linked: manifesto parallax, timeline spine draw, entrance reveals, stat counters, reading-progress bar |
+| **GSAP + ScrollTrigger** | Everything scroll-linked: manifesto parallax, timeline spine draw, entrance reveals, reading-progress bar |
 | **Framer Motion** | React component state only: route transitions, mobile menu, theme-icon swap, card hover. Never bound to scroll |
 | **anime.js** | One job: the hero terminal typewriter |
 
@@ -96,10 +96,9 @@ with JS off or reduced motion on nothing is ever hidden and no content can be st
 
 ## Skeletons
 
-One only: `app/{platform,paykit,book-api}/loading.js`, shown during client-side route
+One only: `app/{platform,book-api}/loading.js`, shown during client-side route
 transitions. Chapter JSON is bundled at build time and already in the server-rendered HTML,
-so a skeleton over it would be a fake loading state that damages LCP. The portrait also gets
-one behind the image until it decodes. Nothing else.
+so a skeleton over it would be a fake loading state that damages LCP. Nothing else.
 
 Dimensions match by construction: each block renders the real string with `text-transparent`
 and the shimmer behind it, so the box is the same size at every width.
@@ -113,22 +112,22 @@ and the shimmer behind it, so the box is the same size at every width.
 feature explicitly. Without that, `.js-motion` never applies and the suite passes while
 testing nothing.
 
-**210/210 checks pass**, covering:
+**211/211 checks pass**, covering:
 
-- No horizontal scroll at 320 / 375 / 480 / 700 / 768 / 1024 / 1280 / 1440 on all six routes, after a full scroll pass, with a clean console at each
-- Every `[data-reveal]` reaches opacity 1 on all five routes at three widths
+- No horizontal scroll at 320 / 375 / 480 / 700 / 768 / 1024 / 1280 / 1440 on all five entries (the four routes plus the 404 page), after a full scroll pass, with a clean console at each
+- Every `[data-reveal]` reaches opacity 1 on all four routes at three widths
 - Timeline is an `<ol>`, all 5 entries, all 5 node dots activate, spine draws with scroll
-- Counters sit at exactly zero off-screen and land on `0.23 / 8.2 / 93.3 / 9.44`
 - Parallax off below 480, active above, travel within the 60px cap
 - Terminal: typewriter completes with no character left hidden; `help`, `ls`, `whoami`, unknown-command and `clear` all work; **panel height is byte-identical before and after output** (zero CLS)
-- Reading-progress bar fills on all three chapter routes
+- Reading-progress bar fills on both chapter routes
 - Marquee animates at 44s, and 31s below 480px
-- Reduced motion on every route: no `.js-motion`, nothing below opacity 1, parallax zeroed, marquee stopped, typewriter printed in full, counters at final values
+- Reduced motion on every route: no `.js-motion`, nothing below opacity 1, parallax zeroed, marquee stopped, typewriter printed in full
 - Full tab order walked on every route at 375 and 1280: every stop has a focus ring, and stops reached matches focusable controls
 - One `<main>`, one `<h1>`, header/footer landmarks
 - No font weight above 600, no box shadows except the specified node-dot ring, every heading full stop is the accent colour, and no second accent anywhere
+- No TODO marker reaches the delivered HTML
 - Theme: defaults dark, toggles to light and back, accent darkens, ground/card/terminal/chip are four distinct surfaces in **both** themes, the terminal re-themes with the page, `prefers-color-scheme: light` is honoured, and light-mode ink and accent both clear 4.5:1
-- JS disabled: nothing invisible, content present on all five routes
+- JS disabled: nothing invisible, content present on all four routes
 
 ### Lighthouse
 
@@ -136,10 +135,9 @@ testing nothing.
 |---|---|---|---|---|
 | mobile `/` | 97 | 100 | 100 | 100 |
 | mobile `/platform` | 98 | 100 | 100 | 100 |
-| mobile `/paykit` | 98 | 100 | 100 | 100 |
 | mobile `/book-api` | 98 | 100 | 100 | 100 |
 | mobile `/about` | 97 | 100 | 100 | 100 |
-| desktop (all five) | 100 | 100 | 100 | 100 |
+| desktop (all four) | 100 | 100 | 100 | 100 |
 
 CLS **0** on every route. First Load JS **152 kB gz** on `/`, under the 200 KB budget with
 all three motion libraries.
@@ -178,13 +176,13 @@ Mobile `/` sat at 85–91 until these, each verified by measurement rather than 
 
 ```
 src/
-  app/            routes; three loading.js skeletons, icon.svg, sitemap, robots
+  app/            routes; two loading.js skeletons, icon.svg, sitemap, robots
   components/     Server Components by default; "use client" only where motion or state needs it
   content/        all copy as JSON, one file per route plus site.json and timeline.json
   lib/            gsap.js (loader) · motion.js (vocabulary + gates) · stops.js (green full stops)
                   rich.js (backtick → mono) · todo.js (visible TODO markers)
 scripts/
-  verify.mjs        the 210-check browser matrix
+  verify.mjs        the 211-check browser matrix
   check-links.mjs   every external URL in site.json
 ```
 
@@ -193,5 +191,7 @@ your installed Chrome rather than downloading its own.
 
 ## Deploy
 
-Vercel, zero config. Set `baseUrl` in `src/content/site.json` to the real domain first — it
-feeds `metadataBase`, canonicals, `sitemap.xml` and `robots.txt`.
+Vercel, zero config. `baseUrl` in `src/content/site.json` is already set to the domain the
+repo name is expected to produce — it feeds `metadataBase`, canonicals, `sitemap.xml` and
+`robots.txt`. Confirm it matches the URL Vercel actually assigns after the first deploy, and
+correct it if the repo ended up named differently.

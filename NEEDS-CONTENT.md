@@ -7,7 +7,7 @@ things that cannot be checked by a script.
 
 ```bash
 npm run check     # every external URL in site.json
-npm run verify    # 210 behavioural checks
+npm run verify    # 211 behavioural checks
 ```
 
 ---
@@ -24,7 +24,7 @@ Vercel, zero config. Push to GitHub and import the repo there.
 
 ```bash
 git remote add origin <your repo>
-git push -u origin main
+git push -u origin master
 ```
 
 ## 2 — `check-links` fails on `baseUrl` until deployed

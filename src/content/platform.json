@@ -1,7 +1,7 @@
 {
   "title": "GitOps & Observability Platform",
   "kicker": "Open source · 2026",
-  "summary": "A multi-node KIND cluster that reconciles itself from git: Go microservice with Prometheus RED metrics in a minimal non-root image, parameterised Helm chart with HPA and ServiceMonitor, GitHub Actions gating on kubeconform, Helm lint and GHCR publishing, Argo CD with self-healing, and Grafana fed by kube-prometheus-stack plus Loki/Promtail.",
+  "summary": "A multi-node KIND cluster that reconciles itself from git: Go microservice with Prometheus RED metrics in a minimal non-root image, parameterised Helm chart with ServiceMonitor and an optional HPA, GitHub Actions gating on kubeconform, Helm lint and GHCR publishing, Argo CD with self-healing, and Grafana fed by kube-prometheus-stack plus Loki/Promtail.",
   "sourceKey": "platformSource",
   "sourceLabel": "Source on GitHub →",
   "chapters": [
@@ -10,10 +10,10 @@
       "title": "Monitoring ships with the chart",
       "paragraphs": [
         "The Helm chart does not stop at Deployment, Service, and Ingress. It also renders a `ServiceMonitor` so Prometheus discovers the target without anyone editing scrape config, plus a PodDisruptionBudget, a NetworkPolicy and a PrometheusRule. An HPA ships in the chart as well, parameterised but disabled by default — it is available, not active. The Grafana dashboard sits beside the chart rather than inside it, as a ConfigMap carrying the sidecar label, so it loads when the monitoring stack is installed.",
-        "The reason is that observability added later is observability that does not exist. If the dashboard is a separate step, it stays a separate step: the service goes to production, the ticket to add monitoring gets written, and it sits in the backlog until the first incident makes it urgent. Putting it in the chart means the only way to deploy the service is to deploy it observed.",
-        "It also makes the dashboard versioned with the code that emits the metrics. When a metric is renamed, the panel that reads it changes in the same commit and ships in the same release, instead of the dashboard quietly showing a flat line for a week."
+        "The reason is that observability added later is observability that does not exist. If the scrape config is a separate step, it stays a separate step: the service ships, the ticket to add monitoring gets written, and it sits in the backlog until the first incident makes it urgent. Putting the `ServiceMonitor` and the alerting rules in the chart means the only way to deploy this service is to deploy it scraped.",
+        "The dashboard did not get the same treatment, and that is the honest gap. It lives in `kubernetes/grafana/` and is applied by hand, outside the Argo CD application, which points only at `helm/demo-app`. So a renamed metric updates the panel in the same commit but not in the same deploy. Half the argument is implemented; the other half is still a manifest I remember to apply."
       ],
-      "tradeoff": "Chart complexity. The chart is meaningfully larger than the workload strictly requires, it carries a hard assumption that Prometheus Operator and the Grafana sidecar are installed in the cluster, and installing it anywhere without them produces resources nothing reads. I took a chart that is harder to reuse over a service that can be deployed unobserved."
+      "tradeoff": "Chart complexity. The chart is larger than the workload strictly requires and carries a hard assumption that the Prometheus Operator's CRDs are already installed — without them `helm install` fails outright on unknown kinds rather than degrading quietly. I took a chart that is harder to reuse over a service that can be deployed unobserved. The dashboard sitting outside it is the part I have not finished."
     },
     {
       "id": "trivy",
@@ -21,7 +21,7 @@
       "paragraphs": [
         "Trivy runs against the built image before it is pushed, and the job fails on CRITICAL. Failing means the image never reaches the registry, so a vulnerable tag is never something ArgoCD could pull even by accident.",
         "The severity line is where the judgement is. Gating on everything, MEDIUM and LOW included, produces a pipeline that is red most mornings for findings nobody is going to act on, and a red pipeline that is normal is the same as no pipeline. Gating on CRITICAL alone keeps a failure worth reading — but the same setting also filters the report, so HIGH findings are not shown at all rather than shown and ignored. That is a narrower net than I would want on a service carrying real traffic, and it is worth being precise that the gate hides them rather than merely tolerating them.",
-        "There is a second, quieter decision: unfixed vulnerabilities are ignored. A HIGH with no patched version available is not something a build can fix, and blocking on it means blocking every deploy until an upstream maintainer acts. Those are surfaced in the scan output but do not fail the job. The rule I settled on is that the gate blocks what a rebuild can fix, and everything else is information rather than a stop."
+        "There is a second, quieter decision: unfixed vulnerabilities are ignored. A CRITICAL with no patched version available is not something a build can fix, and blocking on it means blocking every deploy until an upstream maintainer acts. But `--ignore-unfixed` drops them from the report rather than merely letting them through, so they are not visible in the output either. The gate blocks what a rebuild can fix and stays silent about the rest — and the silence is the part worth knowing about."
       ],
       "tradeoff": "Ignoring unfixed findings is a real hole — a critical vulnerability with no patch is still a critical vulnerability, and my pipeline will happily ship it. I accepted that because the alternative is a gate that gets disabled the first week it blocks something urgent, and a gate that is switched off protects nothing at all."
     },

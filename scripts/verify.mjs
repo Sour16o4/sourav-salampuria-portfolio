@@ -528,8 +528,7 @@ if (suite('design')) {
         const min = Math.min(r, g, b);
         if (max - min < 26) continue; // greys
         const isAccent = g > r && g > b; // the green family
-        const isTodoAmber = r > 150 && g > 100 && b < 100; // TODO markers only
-        if (!isAccent && !isTodoAmber) bad.add(`${el.tagName.toLowerCase()} ${prop}:${v}`);
+        if (!isAccent) bad.add(`${el.tagName.toLowerCase()} ${prop}:${v}`);
       }
     }
     return [...bad];
@@ -664,6 +663,7 @@ if (suite('routes')) {
   const html = await (await fetch(BASE + '/')).text();
   note(!/mailto:/i.test(html), 'no plain mailto in delivered HTML');
   note(!/Trivy|IaC/.test(html), 'no Trivy or IaC in home HTML');
+  note(!/TODO:/.test(html), 'no TODO marker in home HTML');
 }
 
 /* ---------------------------------------------------------------- no-JS -- */
