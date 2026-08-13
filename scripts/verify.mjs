@@ -93,7 +93,7 @@ if (!BASE) {
   }
 }
 
-const ROUTES = ['/', '/platform', '/paykit', '/book-api', '/about'];
+const ROUTES = ['/', '/platform', '/book-api', '/about'];
 const ALL = [...ROUTES, '/does-not-exist'];
 const WIDTHS = [320, 375, 480, 700, 768, 1024, 1280, 1440];
 const EXPECTED_MISSING = ['/resume.pdf', '/favicon.ico', '/portrait.jpg'];
@@ -234,8 +234,8 @@ if (suite('timeline')) {
       };
     });
     note(t.isList, `timeline is an ordered list @${width}`);
-    note(t.count === 6, `timeline has 6 entries @${width}`, `${t.count}`);
-    note(t.litDots === t.totalDots && t.totalDots === 6, `all node dots activated @${width}`, `${t.litDots}/${t.totalDots}`);
+    note(t.count === 5, `timeline has 5 entries @${width}`, `${t.count}`);
+    note(t.litDots === t.totalDots && t.totalDots === 5, `all node dots activated @${width}`, `${t.litDots}/${t.totalDots}`);
     note(t.dashoffset !== null && t.dashoffset < 100, `spine drew with scroll @${width}`, `${t.dashoffset}`);
     await page.close();
   }
@@ -350,7 +350,7 @@ if (suite('terminal')) {
 
 /* --------------------------------------------------------------- rail ---- */
 if (suite('rail')) {
-  for (const path of ['/platform', '/paykit', '/book-api']) {
+  for (const path of ['/platform', '/book-api']) {
     const page = await newPage({ width: 1280 });
     await page.goto(BASE + path, { waitUntil: 'networkidle0' });
     await settle(page, 600);
@@ -680,7 +680,7 @@ if (suite('routes')) {
   const sm = await fetch(BASE + '/sitemap.xml');
   const smText = await sm.text();
   note(sm.status === 200 && smText.includes('<urlset'), 'sitemap.xml served');
-  for (const p of ['/platform', '/paykit', '/book-api', '/about']) {
+  for (const p of ['/platform', '/book-api', '/about']) {
     note(smText.includes(p), `sitemap lists ${p}`);
   }
   const rb = await fetch(BASE + '/robots.txt');

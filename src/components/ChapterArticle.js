@@ -9,7 +9,7 @@ import { Stops } from '@/lib/stops';
 import { Todo, isTodo } from '@/lib/todo';
 
 /**
- * Shared renderer for /platform, /paykit and /book-api.
+ * Shared renderer for /platform and /book-api.
  *
  * Chapter content comes from a JSON data file, never from JSX. No parallax on
  * a reading surface — the only motion here is the progress bar.

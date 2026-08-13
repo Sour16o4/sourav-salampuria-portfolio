@@ -7,7 +7,6 @@
       "links.linkedin",
       "links.resume",
       "links.platformSource",
-      "links.paykitSource",
       "links.bookApiSource",
       "baseUrl"
     ]
@@ -31,7 +30,6 @@
     "linkedin": "https://www.linkedin.com/in/souravsalampuria",
     "resume": "/resume.pdf",
     "platformSource": "https://github.com/souravsalampuria/gitops-platform",
-    "paykitSource": "https://github.com/souravsalampuria/paykit",
     "bookApiSource": "https://github.com/souravsalampuria/book-inventory-api"
   },
 

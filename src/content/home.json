@@ -70,7 +70,7 @@
           "  help           this list",
           "  skills         print skills.txt",
           "  ls             list the project reports",
-          "  open <name>    open a report — platform, paykit, book-api, about",
+          "  open <name>    open a report — platform, book-api, about",
           "  whoami         one line",
           "  contact        how to reach me",
           "  clear          wipe the screen"
@@ -81,7 +81,6 @@
         ],
         "ls": [
           "platform/    GitOps & Observability Platform — self-reconciling KIND cluster",
-          "paykit/      signed webhook emitter + adversarial replay for Indian PSPs",
           "book-api/    Book Inventory REST API — deliberately small Go service",
           "about/       longer bio"
         ],
@@ -94,7 +93,6 @@
       },
       "routes": {
         "platform": "/platform",
-        "paykit": "/paykit",
         "book-api": "/book-api",
         "about": "/about"
       },

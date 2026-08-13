@@ -21,7 +21,6 @@ const targets = [
   ['links.github', site.links.github],
   ['links.linkedin', site.links.linkedin],
   ['links.platformSource', site.links.platformSource],
-  ['links.paykitSource', site.links.paykitSource],
   ['links.bookApiSource', site.links.bookApiSource],
   ['baseUrl', site.baseUrl],
 ].filter(([, url]) => url && /^https?:\/\//.test(url));

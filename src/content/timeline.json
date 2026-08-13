@@ -39,21 +39,6 @@
       "href": "/platform"
     },
     {
-      "id": "paykit",
-      "when": "2026",
-      "org": "Open source",
-      "title": "paykit",
-      "chips": [
-        "Go",
-        "Razorpay",
-        "Cashfree",
-        "Fuzzing",
-        "CI gates"
-      ],
-      "description": "A local Go CLI that emits correctly-signed webhooks for Indian payment gateways (Razorpay, Cashfree) and replays adversarial cases — duplicate delivery, reordering, corrupted signatures — so integrations stop being tested by hand through a tunnel. Signatures verified against the official provider SDKs. Explicitly not a hosted service and never calls a real payment API.",
-      "href": "/paykit"
-    },
-    {
       "id": "book-api",
       "when": "2025",
       "org": "Open source",
