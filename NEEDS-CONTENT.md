@@ -2,8 +2,7 @@
 
 The content sweep is done: every field that used to render as a visible amber `TODO`
 marker has been filled in from real source material, and the drafting notes that used to
-sit at the top of each content file are gone too. What's left is deployment, and two
-things that cannot be checked by a script.
+sit at the top of each content file are gone too. What's left is deployment.
 
 ```bash
 npm run check     # every external URL in site.json
@@ -38,11 +37,12 @@ baseUrl   https://sourav-salampuria.vercel.app   → 404
 That's expected — nothing is deployed at that URL yet. It self-clears on first deploy
 (or needs the `baseUrl` correction above if the repo name ends up different).
 
-## 3 — Confirm the LinkedIn URL by hand
+## 3 — LinkedIn: confirmed by hand ✓
 
-`https://www.linkedin.com/in/sourav-salampuria` cannot be verified by `check-links` —
-LinkedIn returns 999 or 429 to every automated client by design, not because the link is
-wrong. Open it in a browser once and confirm it resolves to the right profile.
+`https://www.linkedin.com/in/sourav-salampuria` was opened in a browser on 2026-08-13 and
+resolves to the right profile. `check-links` will keep reporting it under "Check manually"
+— LinkedIn returns 999 or 429 to every automated client by design, not because the link is
+wrong. That warning is expected and needs no action.
 
 ## 4 — Deliberately not done
 
