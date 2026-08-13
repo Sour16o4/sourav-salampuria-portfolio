@@ -1,0 +1,31 @@
+{
+  "_meta": {
+    "note": "The master prompt asked for a 'longer bio' but supplied none. Everything in `paragraphs` is DRAFTED in the site's voice — rewrite it. Facts used are only those stated in the prompt: Gurgaon, client platform team via Quess Corp, looking for backend/DevOps roles.",
+    "drafted": [
+      "paragraphs"
+    ]
+  },
+  "label": "006 / about",
+  "title": "About.",
+  "lead": "Backend and platform engineer in Gurgaon, India. Currently on a client platform team through Quess Corp, and looking for backend and DevOps roles.",
+  "paragraphs": [
+    "I write Go, and I build the path that gets it to a cluster and keeps it there. Most of what I find interesting sits at the seam between those two things — a service is not finished when the handler returns the right JSON, it is finished when there is a repeatable way for it to reach production and an honest signal when it stops behaving.",
+    "The thing I keep coming back to is that infrastructure runs on claims nobody checks. A controller advertises self-healing. A chart declares a liveness probe. A pipeline says it blocks on vulnerabilities. In most repositories those are sentences, not results, because verifying them costs an afternoon and no reviewer is going to ask. The gap between a configured guarantee and a tested one is where outages live.",
+    "So the work on this site is written the other way round. Each project has a claim, a test I ran against it on purpose, the number that came back, and — the part that matters most — the list of cases the test does not cover. A benchmark without its boundaries is marketing. I would rather publish a smaller claim I can defend than a larger one I cannot.",
+    "Outside that: I read source when documentation disagrees with behaviour, which happens more than it should."
+  ],
+  "focus": [
+    "Go",
+    "Kubernetes",
+    "Docker",
+    "Helm",
+    "Argo CD",
+    "GitHub Actions",
+    "Prometheus",
+    "Grafana",
+    "Loki",
+    "PostgreSQL",
+    "Linux"
+  ],
+  "resumeLabel": "Résumé (PDF)"
+}

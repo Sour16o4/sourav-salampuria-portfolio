@@ -1,0 +1,605 @@
+@import 'tailwindcss';
+@source '../../src';
+
+/* Hover only where hover exists — touch devices otherwise keep sticky states. */
+@custom-variant hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @slot;
+    }
+  }
+}
+
+@theme {
+  /* Dark, near-black, one green accent. No second chroma anywhere. */
+  --color-bg: #0a0a0a;
+  --color-bg-2: #111112;
+  --color-bg-3: #161618;
+  --color-ink: #ecece8;
+  --color-mute: #8b8983;
+  --color-faint: rgba(236, 236, 232, 0.1);
+  --color-acc: #5be49b;
+  --color-acc-dim: rgba(91, 228, 155, 0.14);
+  /* Text that sits ON the accent. Flips with the theme so the primary button
+     keeps its contrast in both. */
+  --color-acc-fg: #06130d;
+  /* The terminal panel is its own surface — a fourth step in the same family,
+     distinct from the page ground and from cards, never a different material. */
+  --color-terminal: #0f0f11;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas,
+    'Liberation Mono', monospace;
+
+  --radius-chip: 3px;
+  --radius-card: 7px;
+
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1440px;
+
+  --animate-marquee: marquee 44s linear infinite;
+  --animate-caret: caret 1.05s step-end infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes caret {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Themes.
+   Every Tailwind utility compiles to `var(--color-*)`, so swapping those eight
+   variables re-themes the entire site — no `dark:` variants anywhere.
+
+   Dark is the default. Light applies when the visitor's OS asks for it, or
+   when the toggle stamps [data-theme] on <html>. The attribute always wins.
+
+   The site has no browser storage (spec), so the toggle holds for the session
+   and client-side navigation, and resets to the OS preference on hard reload.
+   --------------------------------------------------------------------------- */
+:root {
+  --container: 1120px;
+  --pad-x: clamp(20px, 5vw, 52px);
+  color-scheme: dark;
+}
+
+/* Rose white — four surfaces from one family, each a distinct step, none the
+   same. Ground is the mid tone, cards lift above it, the terminal sits just
+   below it, and chips sit lowest.
+
+       cards     #fdfaf9   lightest
+       ground    #f8f2f0
+       terminal  #f2e9e6
+       chips     #ede2df   deepest
+
+   Ink carries a red bias to match, rather than a neutral charcoal dropped on
+   pink. Measured on the ground: ink 15.6:1, mute 5.4:1, accent 5.9:1; on the
+   terminal surface: ink 14.4:1, accent 5.5:1.
+
+   Duplicated across both selectors so OS preference and the toggle can never
+   drift apart. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    color-scheme: light;
+    --color-bg: #f8f2f0;
+    --color-bg-2: #fdfaf9;
+    --color-bg-3: #ede2df;
+    --color-terminal: #f2e9e6;
+    --color-ink: #1e1a19;
+    --color-mute: #6b615e;
+    --color-faint: rgba(30, 26, 25, 0.14);
+    --color-acc: #0b6b44;
+    --color-acc-dim: rgba(11, 107, 68, 0.14);
+    --color-acc-fg: #fdfaf9;
+  }
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --color-bg: #f8f2f0;
+  --color-bg-2: #fdfaf9;
+  --color-bg-3: #ede2df;
+  --color-terminal: #f2e9e6;
+  --color-ink: #1e1a19;
+  --color-mute: #6b615e;
+  --color-faint: rgba(30, 26, 25, 0.14);
+  --color-acc: #0b6b44;
+  --color-acc-dim: rgba(11, 107, 68, 0.14);
+  --color-acc-fg: #fdfaf9;
+}
+
+:root {
+  --bg: var(--color-bg);
+  --bg-2: var(--color-bg-2);
+  --bg-3: var(--color-bg-3);
+  --ink: var(--color-ink);
+  --mute: var(--color-mute);
+  --faint: var(--color-faint);
+  --acc: var(--color-acc);
+  --acc-dim: var(--color-acc-dim);
+  --acc-fg: var(--color-acc-fg);
+  --terminal: var(--color-terminal);
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    overflow-x: clip;
+    background-color: var(--bg);
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-synthesis-weight: none;
+  }
+
+  /* Weights 400/500/600 only — never 700+. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 0;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+
+  strong,
+  b {
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    text-wrap: pretty;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* iOS zooms any input under 16px on focus. Only enforce the floor at the
+     widths iOS actually runs at, so the terminal prompt can stay 13px on
+     desktop and still line up with its output. */
+  @media (max-width: 1023px) {
+    input,
+    textarea,
+    select {
+      font-size: max(16px, 1em);
+    }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--acc);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--acc-dim);
+    color: var(--ink);
+  }
+}
+
+@layer components {
+  /* ------------------------------------------------------------- layout -- */
+  .container-x {
+    width: 100%;
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-left: max(var(--pad-x), env(safe-area-inset-left));
+    padding-right: max(var(--pad-x), env(safe-area-inset-right));
+  }
+
+  .section-y {
+    padding-block: clamp(72px, 11vw, 132px);
+  }
+
+  .hairline {
+    border-top: 1px solid var(--faint);
+  }
+
+  /* --------------------------------------------------------- typography -- */
+  /* Micro-label: mono, 11px, .16em, uppercase, muted. */
+  .micro {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.4;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+
+  .t-display {
+    font-size: clamp(40px, 7.4vw, 80px);
+    font-weight: 600;
+    line-height: 1.02;
+    letter-spacing: -0.05em;
+  }
+
+  .t-h2 {
+    font-size: clamp(28px, 4.4vw, 48px);
+    font-weight: 600;
+    line-height: 1.08;
+    letter-spacing: -0.04em;
+  }
+
+  .t-h3 {
+    font-size: clamp(19px, 2.2vw, 24px);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+  }
+
+  .t-body {
+    font-size: clamp(15px, 1.1vw, 17px);
+    line-height: 1.7;
+    color: var(--mute);
+  }
+
+  .t-lead {
+    font-size: clamp(16px, 1.35vw, 19px);
+    line-height: 1.65;
+    color: var(--mute);
+  }
+
+  /* ------------------------------------------------------------ surfaces -- */
+  .card {
+    background: var(--bg-2);
+    border: 1px solid var(--faint);
+    border-radius: var(--radius-card);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    background: var(--bg-3);
+    border: 1px solid var(--faint);
+    border-radius: var(--radius-chip);
+    padding: 4px 9px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    color: var(--mute);
+    white-space: nowrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 18px;
+    border-radius: var(--radius-chip);
+    border: 1px solid var(--faint);
+    background: transparent;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.18s cubic-bezier(0.33, 1, 0.68, 1),
+      background-color 0.18s cubic-bezier(0.33, 1, 0.68, 1),
+      color 0.18s cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  .btn-primary {
+    background: var(--acc);
+    border-color: var(--acc);
+    color: var(--acc-fg);
+    font-weight: 600;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn:hover {
+      border-color: var(--acc);
+      color: var(--acc);
+    }
+
+    .btn-primary:hover {
+      background: #6df0a8;
+      border-color: #6df0a8;
+      color: var(--acc-fg);
+    }
+  }
+
+  .link-quiet {
+    color: var(--mute);
+    transition: color 0.18s cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .link-quiet:hover {
+      color: var(--ink);
+    }
+  }
+
+  /* -------------------------------------------------------------- input -- */
+  .field {
+    width: 100%;
+    background: var(--bg-2);
+    border: 1px solid var(--faint);
+    border-radius: var(--radius-chip);
+    padding: 12px 14px;
+    color: var(--ink);
+    transition: border-color 0.18s cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  .field::placeholder {
+    color: var(--mute);
+    opacity: 0.7;
+  }
+
+  .field:focus {
+    border-color: var(--acc);
+  }
+
+  /* ----------------------------------------------------------- terminal -- */
+  /* The terminal follows the theme like every other surface. It gets its own
+     token so it reads as a distinct panel rather than a repeat of the card,
+     but it is the same material as the rest of the page. */
+  .terminal {
+    background: var(--terminal);
+    border: 1px solid var(--faint);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+
+  /* Window chrome dots — muted, so they sit back in either theme. */
+  .terminal-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--mute) 45%, transparent);
+  }
+
+  .terminal-caret {
+    display: inline-block;
+    width: 8px;
+    height: 1.05em;
+    margin-left: 2px;
+    background: var(--acc);
+    vertical-align: text-bottom;
+    animation: var(--animate-caret);
+  }
+
+  /* ------------------------------------------------------------ marquee -- */
+  /* Fade only the outer sliver — at 12% the edge chips were half-dead and read
+     as a rendering fault rather than a mask. */
+  .marquee-mask {
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 5%,
+      #000 95%,
+      transparent
+    );
+    mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  }
+
+  /* Ticker pill. Brighter than the generic .chip — mute text on bg-3 was too
+     low-contrast to read while moving. */
+  .chip-stack {
+    display: inline-flex;
+    align-items: center;
+    height: 34px;
+    padding: 0 14px;
+    border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+    border-radius: var(--radius-chip);
+    background: var(--bg-2);
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    letter-spacing: 0.01em;
+    color: color-mix(in srgb, var(--ink) 86%, transparent);
+    white-space: nowrap;
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: var(--animate-marquee);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .marquee-mask:hover .marquee-track {
+      animation-play-state: paused;
+    }
+  }
+
+  /* Below 480px the marquee runs 30% faster. */
+  @media (max-width: 479px) {
+    .marquee-track {
+      animation-duration: 31s;
+    }
+  }
+
+  /* ----------------------------------------------------------- timeline -- */
+  .spine {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--faint);
+  }
+
+  .node-dot {
+    background: var(--bg);
+    border: 1px solid var(--faint);
+    border-radius: 999px;
+    transition: background-color 0.35s cubic-bezier(0.33, 1, 0.68, 1),
+      border-color 0.35s cubic-bezier(0.33, 1, 0.68, 1),
+      box-shadow 0.35s cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  .node-dot[data-on='true'] {
+    background: var(--acc);
+    border-color: var(--acc);
+    box-shadow: 0 0 0 5px var(--acc-dim);
+  }
+
+  /* ----------------------------------------------------------- skeleton -- */
+  .skeleton {
+    background: var(--bg-2);
+    border-radius: var(--radius-chip);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--ink) 7%, transparent),
+      transparent
+    );
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  /* --------------------------------------------------------- skip link -- */
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 100;
+    background: var(--bg-2);
+    border: 1px solid var(--acc);
+    border-radius: var(--radius-chip);
+    padding: 10px 14px;
+  }
+
+  .skip-link:focus {
+    left: max(var(--pad-x), env(safe-area-inset-left));
+    top: 10px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Entrance baseline. Elements are only pre-hidden when JS is running AND
+   reduced motion is off, so nothing can ever be stranded invisible.
+   --------------------------------------------------------------------------- */
+.js-motion [data-reveal] {
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.js-motion [data-reveal-stagger] > * {
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion: entrances resolve instantly, parallax to zero, typewriter
+   prints in full, counters show final values, marquee stops.
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .js-motion [data-reveal],
+  [data-reveal],
+  .js-motion [data-reveal-stagger] > *,
+  [data-reveal-stagger] > * {
+    opacity: 1 !important;
+    transform: none !important;
+    will-change: auto;
+  }
+
+  [data-parallax] {
+    transform: none !important;
+  }
+
+  .marquee-track {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .terminal-caret {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .skeleton::after {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "_meta": {
+    "note": "Every `when`, `org`, `title` and `chips` value is VERBATIM from the master prompt. The three open-source descriptions are verbatim too. Descriptions marked 'TODO:' were NOT supplied — the prompt forbids inventing outcomes, so they render as visible markers until you write them.",
+    "verbatim": [
+      "entries[*].when",
+      "entries[*].org",
+      "entries[*].title",
+      "entries[*].chips"
+    ]
+  },
+  "entries": [
+    {
+      "id": "quess",
+      "when": "Current",
+      "org": "Quess Corp (client deputation)",
+      "title": "Executive, platform team",
+      "chips": [
+        "Kubernetes",
+        "CI/CD",
+        "Linux",
+        "Ops"
+      ],
+      "description": "TODO: one or two sentences on what you actually do on the platform team. No outcomes were supplied, so nothing has been written for you.",
+      "href": null
+    },
+    {
+      "id": "platform",
+      "when": "2026",
+      "org": "Open source",
+      "title": "GitOps & Observability Platform",
+      "chips": [
+        "KIND",
+        "Argo CD",
+        "Helm",
+        "Prometheus",
+        "Loki"
+      ],
+      "description": "A multi-node KIND cluster that reconciles itself from git: Go microservice with Prometheus RED metrics in a minimal non-root image, parameterised Helm chart with HPA and ServiceMonitor, GitHub Actions gating on kubeconform, Helm lint and GHCR publishing, Argo CD with self-healing, and Grafana fed by kube-prometheus-stack plus Loki/Promtail.",
+      "href": "/platform"
+    },
+    {
+      "id": "paykit",
+      "when": "2026",
+      "org": "Open source",
+      "title": "paykit",
+      "chips": [
+        "Go",
+        "Razorpay",
+        "Cashfree",
+        "Fuzzing",
+        "CI gates"
+      ],
+      "description": "A local Go CLI that emits correctly-signed webhooks for Indian payment gateways (Razorpay, Cashfree) and replays adversarial cases — duplicate delivery, reordering, corrupted signatures — so integrations stop being tested by hand through a tunnel. Signatures verified against the official provider SDKs. Explicitly not a hosted service and never calls a real payment API.",
+      "href": "/paykit"
+    },
+    {
+      "id": "book-api",
+      "when": "2025",
+      "org": "Open source",
+      "title": "Book Inventory REST API",
+      "chips": [
+        "Go",
+        "REST",
+        "Postgres",
+        "Docker"
+      ],
+      "description": "A deliberately small Go service, used to check whether a new idea about testing, tracing or deployment survives contact with something real.",
+      "href": "/book-api"
+    },
+    {
+      "id": "internship-studio",
+      "when": "2024",
+      "org": "Internship Studio",
+      "title": "DevOps Engineer Intern",
+      "chips": [
+        "Docker",
+        "CI/CD",
+        "Linux"
+      ],
+      "description": "TODO: what you built or automated during the internship. Not supplied.",
+      "href": null
+    },
+    {
+      "id": "srm",
+      "when": "2020–24",
+      "org": "SRM University",
+      "title": "B.Tech, Computer Science & Engineering",
+      "chips": [
+        "Systems",
+        "Networks",
+        "Databases"
+      ],
+      "description": "TODO: optional — a line on coursework or final-year project, or delete this field to render the card without a description.",
+      "href": null
+    }
+  ]
+}

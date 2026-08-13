@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "note": "`summary` is VERBATIM from the master prompt. The endpoint and layer chapters carry over the drafted prose from the previous build — still drafted, still yours to correct. Text inside backticks renders in mono.",
+    "drafted": ["chapters[*].paragraphs", "chapters[*].tradeoff"]
+  },
+
+  "title": "Book Inventory REST API",
+  "kicker": "Open source · 2025",
+  "summary": "A deliberately small Go service, used to check whether a new idea about testing, tracing or deployment survives contact with something real.",
+
+  "sourceKey": "bookApiSource",
+  "sourceLabel": "Source on GitHub →",
+
+  "metrics": [
+    { "id": "endpoints", "value": "5", "unit": "", "label": "endpoints" },
+    { "id": "layers", "value": "4", "unit": "", "label": "layers" }
+  ],
+
+  "chapters": [
+    {
+      "id": "why",
+      "title": "Why it is this small",
+      "paragraphs": [
+        "Five endpoints over one resource is barely a service. That was the point — a domain small enough that nothing in it can hide a structural mistake. If the layering is wrong here, it is obviously wrong, because there is no complexity to blame it on.",
+        "The rule enforced throughout is that dependencies point inward and types do not leak outward. The service layer defines the repository interface it needs; the storage package implements it. A handler cannot reach a database connection because it has never been handed one, and the service cannot see an HTTP status code because none is in scope."
+      ],
+      "tradeoff": "A service this small cannot tell you whether the structure survives growth. Four layers over five endpoints is more ceremony than the domain needs, and the honest answer is that the layering is being rehearsed here rather than earned."
+    },
+    {
+      "id": "surface",
+      "title": "The surface",
+      "paragraphs": [
+        "`GET /books` lists with pagination. `GET /books/{id}` fetches one. `POST /books` creates, validated. `PUT /books/{id}` replaces. `DELETE /books/{id}` removes. That is the whole API.",
+        "The four layers are `transport` (HTTP handlers — decode, validate shape, map errors to status codes, and nothing about storage), `service` (business rules and the only place they live, taking and returning domain types and never an `http.Request`), `repository` (an interface owned by the service layer and implemented below it), and `storage` (the concrete driver and the queries — the only file that knows what a row looks like)."
+      ],
+      "tradeoff": "Replacing the store means implementing one interface, which is the payoff. It also means every query lives behind an abstraction that hides what the database is actually doing, which is the cost."
+    },
+    {
+      "id": "errors",
+      "title": "Errors that survive the trip",
+      "paragraphs": [
+        "The layer that knows a book was not found is the repository. The layer that knows that means `404` is the transport. Getting an error between those two without either one learning the other's vocabulary is most of what this project is actually about.",
+        "Sentinel errors are declared in the domain package and wrapped on the way up with `fmt.Errorf` and `%w`. Transport unwraps with `errors.Is` and maps to a status code in exactly one place. There is no `if err.Error() == \"not found\"` anywhere, which is the failure mode this structure exists to prevent."
+      ],
+      "tradeoff": "Sentinel errors couple the layers to a shared vocabulary. Add enough of them and the domain package becomes a dumping ground that every layer imports — which is the thing the layering was supposed to prevent."
+    }
+  ]
+}

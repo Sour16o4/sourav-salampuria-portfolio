@@ -1,0 +1,44 @@
+{
+  "_meta": {
+    "note": "Fields in `drafted` were not supplied by the master prompt. Fields in `todo` are placeholders that MUST be replaced before deploying — they render as visible TODO markers.",
+    "drafted": ["role", "description", "email.user", "email.domain"],
+    "todo": [
+      "links.github",
+      "links.linkedin",
+      "links.resume",
+      "links.platformSource",
+      "links.paykitSource",
+      "links.bookApiSource",
+      "baseUrl"
+    ]
+  },
+
+  "name": "Sourav Salampuria",
+  "brand": "salampuria",
+  "role": "Backend & platform engineer",
+  "location": "Gurgaon, India",
+  "description": "Backend and platform engineer in Gurgaon, India. I break my own infrastructure on purpose and write down exactly how far each guarantee reaches.",
+
+  "baseUrl": "https://souravsalampuria.dev",
+
+  "email": {
+    "user": "souravsalampuriadev",
+    "domain": "gmail.com"
+  },
+
+  "links": {
+    "github": "https://github.com/souravsalampuria",
+    "linkedin": "https://www.linkedin.com/in/souravsalampuria",
+    "resume": "/resume.pdf",
+    "platformSource": "https://github.com/souravsalampuria/gitops-platform",
+    "paykitSource": "https://github.com/souravsalampuria/paykit",
+    "bookApiSource": "https://github.com/souravsalampuria/book-inventory-api"
+  },
+
+  "nav": [
+    { "label": "Work", "href": "/#work" },
+    { "label": "Measured", "href": "/#measured" },
+    { "label": "About", "href": "/about" },
+    { "label": "Contact", "href": "/#contact" }
+  ]
+}

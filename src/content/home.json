@@ -1,0 +1,186 @@
+{
+  "_meta": {
+    "note": "Terminal lines, stat figures, stat captions and the caveat are VERBATIM from the master prompt — do not edit them. Fields in `drafted` are mine and are safe to rewrite. Anything whose value starts with 'TODO:' renders as a visible marker and must be replaced.",
+    "drafted": [
+      "hero.bio",
+      "hero.roleLine",
+      "hero.actions",
+      "manifesto.paragraphs",
+      "marquee.items"
+    ]
+  },
+  "hero": {
+    "locationLabel": "Gurgaon, India",
+    "name": "Sourav Salampuria",
+    "roleLine": "backend · platform · devops",
+    "bio": "I build delivery platforms and then attack them on purpose, so the guarantees they advertise are measured rather than assumed.",
+    "actions": [
+      {
+        "label": "See the work",
+        "href": "#work",
+        "variant": "primary"
+      },
+      {
+        "label": "Platform report",
+        "href": "/platform",
+        "variant": "ghost"
+      },
+      {
+        "label": "Get in touch",
+        "href": "#contact",
+        "variant": "ghost"
+      }
+    ]
+  },
+  "terminal": {
+    "title": "~/salampuria — skills.txt",
+    "command": "$ cat skills.txt",
+    "groups": [
+      {
+        "key": "language",
+        "value": "Go · SQL · Bash"
+      },
+      {
+        "key": "platform",
+        "value": "Kubernetes · Docker · Helm · Argo CD"
+      },
+      {
+        "key": "observe",
+        "value": "Prometheus · Grafana · Loki"
+      },
+      {
+        "key": "deliver",
+        "value": "GitHub Actions · GHCR"
+      },
+      {
+        "key": "data",
+        "value": "PostgreSQL · MySQL"
+      }
+    ],
+    "comment": "# claims are tested here, not asserted",
+    "shell": {
+      "prompt": "$",
+      "hint": "type `help` — this shell is real",
+      "inputLabel": "Terminal input. Type a command and press Enter.",
+      "notFound": "command not found: {cmd} — try 'help'",
+      "commands": {
+        "help": [
+          "available commands",
+          "",
+          "  help           this list",
+          "  skills         print skills.txt",
+          "  ls             list the project reports",
+          "  open <name>    open a report — platform, paykit, book-api, about",
+          "  whoami         one line",
+          "  contact        how to reach me",
+          "  clear          wipe the screen"
+        ],
+        "whoami": [
+          "Sourav Salampuria — backend & platform engineer, Gurgaon.",
+          "I break my own infrastructure on purpose and publish what the tests do not cover."
+        ],
+        "ls": [
+          "platform/    GitOps & Observability Platform — self-reconciling KIND cluster",
+          "paykit/      signed webhook emitter + adversarial replay for Indian PSPs",
+          "book-api/    Book Inventory REST API — deliberately small Go service",
+          "about/       longer bio"
+        ],
+        "contact": [
+          "email    {email}",
+          "github   {github}",
+          "",
+          "or use the form at the bottom of this page."
+        ]
+      },
+      "routes": {
+        "platform": "/platform",
+        "paykit": "/paykit",
+        "book-api": "/book-api",
+        "about": "/about"
+      },
+      "opening": "opening {path} …"
+    }
+  },
+  "manifesto": {
+    "heading": "Build. Then verify.",
+    "portrait": {
+      "src": "TODO: add /portrait.jpg — a real photograph. The master prompt forbids stock photography.",
+      "alt": "Sourav Salampuria",
+      "width": 720,
+      "height": 900
+    },
+    "paragraphs": [
+      "Most infrastructure claims are never tested. A controller advertises self-healing, a chart declares a probe, a pipeline says it gates on vulnerabilities — and in almost every repository those sentences are taken on trust, because checking them costs a real afternoon and nobody is asking.",
+      "So I break my own systems on purpose. I scale a deployment by hand against a live cluster to see whether reconciliation actually reverts it, and I slow my own code down until the regression gate fires, because a gate that has never fired looks exactly like a gate that cannot. What I publish is not the claim. It is the test, the result, and the list of cases the test does not cover."
+    ]
+  },
+  "marquee": {
+    "items": [
+      "Go",
+      "Kubernetes",
+      "Docker",
+      "Helm",
+      "Argo CD",
+      "Prometheus",
+      "Grafana",
+      "Loki",
+      "GitHub Actions",
+      "PostgreSQL",
+      "MySQL",
+      "Bash",
+      "Linux",
+      "KIND"
+    ]
+  },
+  "work": {
+    "label": "003 / timeline",
+    "heading": "The work."
+  },
+  "measured": {
+    "label": "004 / evidence",
+    "heading": "Measured, not claimed.",
+    "stats": [
+      {
+        "id": "p99",
+        "value": 0.23,
+        "decimals": 2,
+        "unit": "ms",
+        "caption": "p99 webhook emission — budget was 50 ms"
+      },
+      {
+        "id": "cold",
+        "value": 8.2,
+        "decimals": 1,
+        "unit": "ms",
+        "caption": "median cold start — budget was 200 ms"
+      },
+      {
+        "id": "cov",
+        "value": 93.3,
+        "decimals": 1,
+        "unit": "%",
+        "caption": "test coverage, provider package"
+      },
+      {
+        "id": "bin",
+        "value": 9.44,
+        "decimals": 2,
+        "unit": "MiB",
+        "caption": "static binary — budget was 25 MB"
+      }
+    ],
+    "caveat": "Every figure above is re-measured on each change, and the regression gate was itself verified by deliberately slowing the code until it failed. A gate that has never fired looks identical to one that cannot."
+  },
+  "contact": {
+    "label": "005 / contact",
+    "heading": "Say something.",
+    "lead": "Open to backend and DevOps roles. The fastest route is email, but the form works too.",
+    "endpoint": "TODO: no form backend is configured. Until one is, submissions fall back to opening the visitor's mail client. Set this to a POST endpoint (Formspree, Resend, a Vercel route) to change that.",
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "message": "Message"
+    },
+    "submit": "Send"
+  }
+}
