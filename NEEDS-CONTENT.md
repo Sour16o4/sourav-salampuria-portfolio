@@ -15,9 +15,9 @@ npm run verify    # 211 behavioural checks
 
 Vercel, zero config. Push to GitHub and import the repo there.
 
-**Name the repo `sourav-salampuria`.** Vercel's assigned URL follows the repo name, and
-`baseUrl` in `src/content/site.json` is already set to
-`https://sourav-salampuria.vercel.app` — it feeds `metadataBase`, canonicals,
+**Name the repo `sourav-salampuria-portfolio`.** Vercel's assigned URL follows the repo
+name, and `baseUrl` in `src/content/site.json` is already set to
+`https://sourav-salampuria-portfolio.vercel.app` — it feeds `metadataBase`, canonicals,
 `sitemap.xml` and `robots.txt`. If the repo ends up named anything else, correct
 `baseUrl` to match the URL Vercel actually assigns before calling the site finished.
 
@@ -31,7 +31,7 @@ git push -u origin master
 `npm run check` currently reports one failure:
 
 ```
-baseUrl   https://sourav-salampuria.vercel.app   → 404
+baseUrl   https://sourav-salampuria-portfolio.vercel.app   → 404
 ```
 
 That's expected — nothing is deployed at that URL yet. It self-clears on first deploy
