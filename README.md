@@ -14,7 +14,7 @@ npm run build
 npm start
 
 npm run lint           # ESLint CLI, next/core-web-vitals
-npm run verify         # 252 behavioural checks in real Chrome
+npm run verify         # 210 behavioural checks in real Chrome
 npm run verify:motion  # only the motion suites
 npm run check          # external links in site.json
 ```
@@ -113,7 +113,7 @@ and the shimmer behind it, so the box is the same size at every width.
 feature explicitly. Without that, `.js-motion` never applies and the suite passes while
 testing nothing.
 
-**252/252 checks pass**, covering:
+**210/210 checks pass**, covering:
 
 - No horizontal scroll at 320 / 375 / 480 / 700 / 768 / 1024 / 1280 / 1440 on all six routes, after a full scroll pass, with a clean console at each
 - Every `[data-reveal]` reaches opacity 1 on all five routes at three widths
@@ -184,7 +184,7 @@ src/
   lib/            gsap.js (loader) · motion.js (vocabulary + gates) · stops.js (green full stops)
                   rich.js (backtick → mono) · todo.js (visible TODO markers)
 scripts/
-  verify.mjs        the 252-check browser matrix
+  verify.mjs        the 210-check browser matrix
   check-links.mjs   every external URL in site.json
 ```
 

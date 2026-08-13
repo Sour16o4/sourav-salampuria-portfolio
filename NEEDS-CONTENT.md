@@ -9,7 +9,7 @@ invented prose. They are impossible to miss and impossible to ship by accident.
 
 ```bash
 npm run check     # every external URL in site.json
-npm run verify    # 252 behavioural checks
+npm run verify    # 210 behavioural checks
 ```
 
 ---

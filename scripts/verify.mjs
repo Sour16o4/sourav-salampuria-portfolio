@@ -96,7 +96,7 @@ if (!BASE) {
 const ROUTES = ['/', '/platform', '/book-api', '/about'];
 const ALL = [...ROUTES, '/does-not-exist'];
 const WIDTHS = [320, 375, 480, 700, 768, 1024, 1280, 1440];
-const EXPECTED_MISSING = ['/resume.pdf', '/favicon.ico'];
+const EXPECTED_MISSING = ['/favicon.ico'];
 
 const results = [];
 const problems = [];

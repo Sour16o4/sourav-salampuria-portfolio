@@ -15,7 +15,10 @@ import { Todo, isTodo } from '@/lib/todo';
  */
 export default function ContactForm({ contact }) {
   const [values, setValues] = useState({ name: '', email: '', message: '' });
-  const noEndpoint = isTodo(contact.endpoint);
+  // No endpoint at all, or a placeholder that is not one yet — either way the
+  // mail draft is the behaviour. The TODO marker is rendered separately, so
+  // clearing it does not silently turn the form into a POST to nowhere.
+  const noEndpoint = !contact.endpoint || isTodo(contact.endpoint);
 
   const update = (key) => (event) =>
     setValues((previous) => ({ ...previous, [key]: event.target.value }));
@@ -98,7 +101,7 @@ export default function ContactForm({ contact }) {
             </div>
           </form>
 
-          {noEndpoint ? (
+          {isTodo(contact.endpoint) ? (
             <div className="mt-6">
               <Todo value={contact.endpoint} />
             </div>

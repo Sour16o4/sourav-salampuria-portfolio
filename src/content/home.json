@@ -1,14 +1,4 @@
 {
-  "_meta": {
-    "note": "Terminal lines, stat figures, stat captions and the caveat are VERBATIM from the master prompt — do not edit them. Fields in `drafted` are mine and are safe to rewrite. Anything whose value starts with 'TODO:' renders as a visible marker and must be replaced.",
-    "drafted": [
-      "hero.bio",
-      "hero.roleLine",
-      "hero.actions",
-      "manifesto.paragraphs",
-      "marquee.items"
-    ]
-  },
   "hero": {
     "locationLabel": "Gurgaon, India",
     "name": "Sourav Salampuria",
@@ -132,7 +122,7 @@
     "label": "004 / contact",
     "heading": "Say something.",
     "lead": "Open to backend and DevOps roles. The fastest route is email, but the form works too.",
-    "endpoint": "TODO: no form backend is configured. Until one is, submissions fall back to opening the visitor's mail client. Set this to a POST endpoint (Formspree, Resend, a Vercel route) to change that.",
+    "endpoint": "",
     "fields": {
       "name": "Name",
       "email": "Email",
