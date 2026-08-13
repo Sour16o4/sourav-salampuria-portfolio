@@ -22,8 +22,8 @@ name, and `baseUrl` in `src/content/site.json` is already set to
 `baseUrl` to match the URL Vercel actually assigns before calling the site finished.
 
 ```bash
-git remote add origin <your repo>
-git push -u origin master
+git remote add origin https://github.com/Sour16o4/sourav-salampuria-portfolio.git
+git push -u origin main
 ```
 
 ## 2 — `check-links` fails on `baseUrl` until deployed
