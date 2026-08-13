@@ -35,7 +35,6 @@
 
   "nav": [
     { "label": "Work", "href": "/#work" },
-    { "label": "Measured", "href": "/#measured" },
     { "label": "About", "href": "/about" },
     { "label": "Contact", "href": "/#contact" }
   ]

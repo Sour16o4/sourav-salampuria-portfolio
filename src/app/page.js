@@ -2,7 +2,6 @@ import ContactForm from '@/components/ContactForm';
 import Hero from '@/components/Hero';
 import Manifesto from '@/components/Manifesto';
 import Marquee from '@/components/Marquee';
-import Measured from '@/components/Measured';
 import Timeline from '@/components/Timeline';
 import home from '@/content/home.json';
 import timeline from '@/content/timeline.json';
@@ -10,7 +9,7 @@ import timeline from '@/content/timeline.json';
 /**
  * Home, in order:
  *   nav (layout) · hero + terminal · manifesto · marquee · timeline ·
- *   measured · contact · footer (layout)
+ *   contact · footer (layout)
  */
 export default function HomePage() {
   return (
@@ -26,8 +25,6 @@ export default function HomePage() {
         heading={home.work.heading}
         entries={timeline.entries}
       />
-
-      <Measured measured={home.measured} />
 
       <ContactForm contact={home.contact} />
     </main>

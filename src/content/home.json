@@ -109,7 +109,7 @@
     },
     "paragraphs": [
       "Most infrastructure claims are never tested. A controller advertises self-healing, a chart declares a probe, a pipeline says it gates on vulnerabilities — and in almost every repository those sentences are taken on trust, because checking them costs a real afternoon and nobody is asking.",
-      "So I break my own systems on purpose. I scale a deployment by hand against a live cluster to see whether reconciliation actually reverts it, and I slow my own code down until the regression gate fires, because a gate that has never fired looks exactly like a gate that cannot. What I publish is not the claim. It is the test, the result, and the list of cases the test does not cover."
+      "So I break my own systems on purpose. I scale a deployment by hand against a live cluster to see whether reconciliation actually reverts it, because a controller that has never been contradicted looks exactly like one that cannot be. What I publish is not the claim. It is the test, the result, and the list of cases the test does not cover."
     ]
   },
   "marquee": {
@@ -133,41 +133,6 @@
   "work": {
     "label": "003 / timeline",
     "heading": "The work."
-  },
-  "measured": {
-    "label": "004 / evidence",
-    "heading": "Measured, not claimed.",
-    "stats": [
-      {
-        "id": "p99",
-        "value": 0.23,
-        "decimals": 2,
-        "unit": "ms",
-        "caption": "p99 webhook emission — budget was 50 ms"
-      },
-      {
-        "id": "cold",
-        "value": 8.2,
-        "decimals": 1,
-        "unit": "ms",
-        "caption": "median cold start — budget was 200 ms"
-      },
-      {
-        "id": "cov",
-        "value": 93.3,
-        "decimals": 1,
-        "unit": "%",
-        "caption": "test coverage, provider package"
-      },
-      {
-        "id": "bin",
-        "value": 9.44,
-        "decimals": 2,
-        "unit": "MiB",
-        "caption": "static binary — budget was 25 MB"
-      }
-    ],
-    "caveat": "Every figure above is re-measured on each change, and the regression gate was itself verified by deliberately slowing the code until it failed. A gate that has never fired looks identical to one that cannot."
   },
   "contact": {
     "label": "005 / contact",

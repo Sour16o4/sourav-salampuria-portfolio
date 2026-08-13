@@ -27,7 +27,7 @@ const args = Object.fromEntries(
     return [k, v ?? true];
   })
 );
-const MOTION_SUITES = ['reveal', 'timeline', 'stats', 'parallax', 'terminal', 'rail', 'marquee', 'reduced'];
+const MOTION_SUITES = ['reveal', 'timeline', 'parallax', 'terminal', 'rail', 'marquee', 'reduced'];
 const WANTED = args.motion ? MOTION_SUITES : args.only ? String(args.only).split(',').map((s) => s.trim()) : null;
 const wants = (s) => !WANTED || WANTED.includes(s);
 
@@ -241,29 +241,6 @@ if (suite('timeline')) {
   }
 }
 
-/* ---------------------------------------------------------------- stats -- */
-if (suite('stats')) {
-  const offscreen = await newPage({ width: 1280, height: 400 });
-  await offscreen.goto(BASE + '/', { waitUntil: 'networkidle0' });
-  const zero = await offscreen.evaluate(() =>
-    [...document.querySelectorAll('[data-stat]')].map((e) => e.textContent)
-  );
-  note(zero.join() === '0.00,0.0,0.0,0.00', 'stats sit at zero while off screen', zero.join());
-  await offscreen.close();
-
-  const page = await newPage({ width: 1280 });
-  await page.goto(BASE + '/', { waitUntil: 'networkidle0' });
-  await page.evaluate(async () => {
-    document.getElementById('measured').scrollIntoView({ block: 'center' });
-    await new Promise((r) => setTimeout(r, 2200));
-  });
-  const final = await page.evaluate(() =>
-    [...document.querySelectorAll('[data-stat]')].map((e) => e.textContent)
-  );
-  note(final.join() === '0.23,8.2,93.3,9.44', 'stats count up to the published figures', final.join());
-  await page.close();
-}
-
 /* ------------------------------------------------------------- parallax -- */
 if (suite('parallax')) {
   for (const [width, expect] of [[375, 'off'], [768, 'half'], [1440, 'full']]) {
@@ -423,7 +400,6 @@ if (suite('reduced')) {
         // assert the text itself rather than counting characters — otherwise
         // the check passes on an empty set and proves nothing.
         terminalText: document.querySelector('.terminal')?.innerText ?? '',
-        stats: [...document.querySelectorAll('[data-stat]')].map((e) => e.textContent).join(),
       };
     });
     note(!s.motionClass, `RM ${path}: js-motion absent`);
@@ -432,7 +408,6 @@ if (suite('reduced')) {
     note(s.marqueeStopped, `RM ${path}: marquee stopped`);
     note(s.hiddenChars === 0, `RM ${path}: no character left hidden`, `${s.hiddenChars}`);
     if (path === '/') {
-      note(s.stats === '0.23,8.2,93.3,9.44', 'RM /: counters show final values', s.stats);
       note(
         s.terminalText.includes('cat skills.txt') &&
           s.terminalText.includes('claims are tested here'),
@@ -689,7 +664,6 @@ if (suite('routes')) {
   const html = await (await fetch(BASE + '/')).text();
   note(!/mailto:/i.test(html), 'no plain mailto in delivered HTML');
   note(!/Trivy|IaC/.test(html), 'no Trivy or IaC in home HTML');
-  note(html.includes('0.23') && html.includes('9.44'), 'published figures are in the server HTML');
 }
 
 /* ---------------------------------------------------------------- no-JS -- */
