@@ -101,12 +101,6 @@
   },
   "manifesto": {
     "heading": "Build. Then verify.",
-    "portrait": {
-      "src": "TODO: add /portrait.jpg — a real photograph. The master prompt forbids stock photography.",
-      "alt": "Sourav Salampuria",
-      "width": 720,
-      "height": 900
-    },
     "paragraphs": [
       "Most infrastructure claims are never tested. A controller advertises self-healing, a chart declares a probe, a pipeline says it gates on vulnerabilities — and in almost every repository those sentences are taken on trust, because checking them costs a real afternoon and nobody is asking.",
       "So I break my own systems on purpose. I scale a deployment by hand against a live cluster to see whether reconciliation actually reverts it, because a controller that has never been contradicted looks exactly like one that cannot be. What I publish is not the claim. It is the test, the result, and the list of cases the test does not cover."
