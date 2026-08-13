@@ -135,7 +135,7 @@
     "heading": "The work."
   },
   "contact": {
-    "label": "005 / contact",
+    "label": "004 / contact",
     "heading": "Say something.",
     "lead": "Open to backend and DevOps roles. The fastest route is email, but the form works too.",
     "endpoint": "TODO: no form backend is configured. Until one is, submissions fall back to opening the visitor's mail client. Set this to a POST endpoint (Formspree, Resend, a Vercel route) to change that.",
