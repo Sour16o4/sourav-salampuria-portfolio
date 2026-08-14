@@ -122,7 +122,7 @@
     "label": "004 / contact",
     "heading": "Say something.",
     "lead": "Open to backend and DevOps roles. The fastest route is email, but the form works too.",
-    "endpoint": "",
+    "endpoint": "/api/contact",
     "fields": {
       "name": "Name",
       "email": "Email",

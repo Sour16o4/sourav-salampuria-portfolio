@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Reveal from '@/components/Reveal';
 import site from '@/content/site.json';
@@ -8,31 +8,78 @@ import { Stops } from '@/lib/stops';
 import { Todo, isTodo } from '@/lib/todo';
 
 /**
- * No form backend is configured. Rather than pretend to submit, this composes
- * a mail draft from the fields — which works today, with no service, no
- * storage, and nothing to leak. Point `contact.endpoint` at a POST URL to
- * replace that behaviour.
+ * Posts to `contact.endpoint`, which is this site's own `/api/contact` route.
+ *
+ * The markup carries a real `action` and `method`, so the form submits and the
+ * route redirects back with the outcome even with JS disabled. When JS is
+ * available the submit is intercepted and answered inline instead, which is the
+ * only difference between the two paths.
+ *
+ * With no endpoint configured at all it falls back to composing a mail draft —
+ * which works with no service and stores nothing, but cannot tell the visitor
+ * whether anything was received.
  */
 export default function ContactForm({ contact }) {
   const [values, setValues] = useState({ name: '', email: '', message: '' });
+  // `idle` | `sending` | `sent` | the error string to show.
+  const [state, setState] = useState('idle');
+
   // No endpoint at all, or a placeholder that is not one yet — either way the
   // mail draft is the behaviour. The TODO marker is rendered separately, so
   // clearing it does not silently turn the form into a POST to nowhere.
   const noEndpoint = !contact.endpoint || isTodo(contact.endpoint);
 
+  // The no-JS path lands back here with the outcome in the query string. Read
+  // it once, then strip it so a reload does not re-announce a stale result.
+  useEffect(() => {
+    const sent = new URLSearchParams(window.location.search).get('sent');
+    if (sent !== 'ok' && sent !== 'error') return;
+    setState(sent === 'ok' ? 'sent' : 'Something went wrong. Try email instead.');
+    const url = new URL(window.location.href);
+    url.searchParams.delete('sent');
+    window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+  }, []);
+
   const update = (key) => (event) =>
     setValues((previous) => ({ ...previous, [key]: event.target.value }));
 
-  const onSubmit = (event) => {
-    if (!noEndpoint) return; // a real endpoint handles it natively
+  const onSubmit = async (event) => {
+    if (noEndpoint) {
+      event.preventDefault();
+      const address = [site.email.user, site.email.domain].join(String.fromCharCode(64));
+      const subject = encodeURIComponent(`Portfolio enquiry — ${values.name || 'no name'}`);
+      const body = encodeURIComponent(
+        `${values.message}\n\n—\n${values.name}\n${values.email}`
+      );
+      window.location.href = `mailto:${address}?subject=${subject}&body=${body}`;
+      return;
+    }
+
     event.preventDefault();
-    const address = [site.email.user, site.email.domain].join(String.fromCharCode(64));
-    const subject = encodeURIComponent(`Portfolio enquiry — ${values.name || 'no name'}`);
-    const body = encodeURIComponent(
-      `${values.message}\n\n—\n${values.name}\n${values.email}`
-    );
-    window.location.href = `mailto:${address}?subject=${subject}&body=${body}`;
+    setState('sending');
+    try {
+      const response = await fetch(contact.endpoint, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(values),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setState(data.error || 'Something went wrong. Try email instead.');
+        return;
+      }
+      setValues({ name: '', email: '', message: '' });
+      setState('sent');
+    } catch {
+      // Offline, blocked, or the route is unreachable. Never leave the button
+      // spinning — say so and let them fall back to email.
+      setState('Could not reach the server. Try email instead.');
+    }
   };
+
+  const sending = state === 'sending';
+  const sent = state === 'sent';
+  const error = state !== 'idle' && !sending && !sent ? state : null;
 
   return (
     <section id="contact" className="hairline section-y" aria-labelledby="contact-heading">
@@ -46,7 +93,12 @@ export default function ContactForm({ contact }) {
         </Reveal>
 
         <div>
-          <form onSubmit={onSubmit} className="grid gap-4">
+          <form
+            onSubmit={onSubmit}
+            action={noEndpoint ? undefined : contact.endpoint}
+            method={noEndpoint ? undefined : 'post'}
+            className="grid gap-4"
+          >
             <div>
               <label htmlFor="cf-name" className="micro mb-2 block">
                 {contact.fields.name}
@@ -94,10 +146,22 @@ export default function ContactForm({ contact }) {
               />
             </div>
 
-            <div>
-              <button type="submit" className="btn btn-primary">
-                {contact.submit}
+            <div className="flex flex-wrap items-center gap-4">
+              <button type="submit" className="btn btn-primary" disabled={sending || sent}>
+                {sending ? 'Sending…' : sent ? 'Sent' : contact.submit}
               </button>
+
+              {/* Announced politely so a screen reader hears the outcome without
+                  losing the caret. The palette is one accent and a grey ramp —
+                  there is no red to reach for, so the wording carries the
+                  meaning and full-strength ink carries the emphasis. */}
+              <p aria-live="polite" className="mono m-0 text-[13px]">
+                {sent ? (
+                  <span className="text-acc">Thanks — that reached my inbox.</span>
+                ) : error ? (
+                  <span className="text-ink">{error}</span>
+                ) : null}
+              </p>
             </div>
           </form>
 
