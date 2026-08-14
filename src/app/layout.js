@@ -55,10 +55,21 @@ export const viewport = {
  */
 const MOTION_GATE = `try{if(window.matchMedia&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('js-motion')}}catch(e){}`;
 
+/**
+ * Restores a previously chosen theme before the first paint.
+ *
+ * Without this the page would render at the OS preference and then flip once
+ * React hydrated — the flash is the whole reason this runs blocking, ahead of
+ * everything below it. No cookie means no explicit choice, so the attribute is
+ * left off and the `prefers-color-scheme` media query decides.
+ */
+const THEME_GATE = `try{var m=document.cookie.match(/(?:^|;\\s*)theme=(light|dark)(?:;|$)/);if(m){document.documentElement.setAttribute('data-theme',m[1])}}catch(e){}`;
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={inter.variable}>
       <body>
+        <script dangerouslySetInnerHTML={{ __html: THEME_GATE }} />
         <script dangerouslySetInnerHTML={{ __html: MOTION_GATE }} />
         <a className="skip-link" href="#main">
           Skip to content

@@ -10,10 +10,11 @@ import { Moon, Sun } from 'lucide-react';
  * The whole palette is eight CSS variables, so this only stamps `data-theme`
  * on <html> — no `dark:` variants, no re-render, no flash.
  *
- * The spec forbids browser storage, so the choice is not persisted: it holds
- * for the session and across client-side navigation, and a hard reload falls
- * back to the visitor's OS preference. That is a deliberate constraint, not an
- * oversight.
+ * The choice persists in a cookie rather than localStorage. The spec rules out
+ * browser storage, and a cookie is the narrower tool: it carries one token,
+ * expires on its own, and is the only mechanism a server-rendered page could
+ * read before paint. `layout.js` reads it in a blocking script so a returning
+ * visitor never sees the wrong theme flash first.
  *
  * Renders a fixed-size button on the server with no icon, so there is no
  * hydration mismatch when the client discovers the real preference.
@@ -37,6 +38,9 @@ export default function ThemeToggle() {
   const toggle = () => {
     const next = theme === 'light' ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', next);
+    // A year, path-wide, SameSite=Lax. One token, no identifier, nothing that
+    // survives clearing site data — the smallest thing that outlives a reload.
+    document.cookie = `theme=${next};path=/;max-age=31536000;samesite=lax`;
     setTheme(next);
   };
 

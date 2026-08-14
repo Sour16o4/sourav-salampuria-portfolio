@@ -620,6 +620,19 @@ if (suite('theme')) {
   note(contrast.ink >= 4.5, 'light: body ink meets 4.5:1', contrast.ink.toFixed(2));
   note(contrast.acc >= 4.5, 'light: accent meets 4.5:1', contrast.acc.toFixed(2));
 
+  // Surviving a hard reload is the whole point of the cookie: a full document
+  // load, not client-side navigation, so the blocking gate in layout.js is what
+  // has to restore it. Asserting the attribute alone would pass even if the
+  // gate ran too late to matter, so the ground colour is checked too.
+  await page.reload({ waitUntil: 'networkidle0' });
+  await settle(page, 350);
+  const reloaded = await read();
+  note(
+    reloaded.attr === 'light' && reloaded.bg === THEME.lightBg,
+    'light choice survives a hard reload',
+    `${reloaded.attr} ${reloaded.bg}`
+  );
+
   await page.click('button[aria-label*="dark theme"]');
   await settle(page, 350);
   const back = await read();
@@ -627,8 +640,14 @@ if (suite('theme')) {
   await page.close();
 
   // OS preference is honoured with no explicit choice.
+  //
+  // Pages share one browser context, so the theme cookie set by the toggling
+  // above leaks into this one. "No explicit choice" means no cookie — without
+  // clearing it this check would read the leftover `dark` and fail, and worse,
+  // it would have been passing for the wrong reason before the cookie existed.
   const light = await browser.newPage();
   await light.setViewport({ width: 1280, height: 900 });
+  await light.deleteCookie({ name: 'theme', url: BASE });
   await light.emulateMediaFeatures([
     { name: 'prefers-color-scheme', value: 'light' },
     { name: 'prefers-reduced-motion', value: 'no-preference' },
