@@ -6,7 +6,7 @@ sit at the top of each content file are gone too. What's left is deployment.
 
 ```bash
 npm run check     # every external URL in site.json
-npm run verify    # 211 behavioural checks
+npm run verify    # 212 behavioural checks
 ```
 
 ---
@@ -44,18 +44,23 @@ resolves to the right profile. `check-links` will keep reporting it under "Check
 — LinkedIn returns 999 or 429 to every automated client by design, not because the link is
 wrong. That warning is expected and needs no action.
 
-## 4 — Deliberately not done
+## 4 — Rotate the Resend key if it has ever been pasted anywhere
 
-These three stay open on purpose, not by oversight:
+`RESEND_API_KEY` lives in Vercel's environment variables and in a gitignored `.env.local`.
+It has never been committed. If the value has been shared in a chat, a screenshot or a
+ticket, treat it as public: revoke it at resend.com → API Keys, issue a new one, update
+both places, and **redeploy** — a saved variable does not reach a deployment that already
+exists.
+
+## 5 — Deliberately not done
+
+One thing stays open on purpose, not by oversight:
 
 - **No portrait photograph.** Stock photography was ruled out, so nothing fills that
   slot until a real photo exists.
-- **No contact-form backend.** Submissions open the visitor's mail client instead of
-  POSTing anywhere — that is the designed behaviour, not a placeholder. It works today,
-  stores nothing, and has no service to maintain. Point `contact.endpoint` in
-  `home.json` at a real POST URL only if that tradeoff changes.
-- **Theme choice doesn't survive a hard reload.** The spec forbids browser storage, so
-  the toggle holds for the session and across client-side navigation, then falls back to
-  the visitor's OS preference on reload. Making it sticky needs a cookie, which would be
-  a deliberate departure from the spec — a call for whoever owns that tradeoff, not
-  something to add silently.
+
+The other two on this list are now built:
+
+- **Contact form** posts to `/api/contact` and sends through Resend, with a `mailto:`
+  fallback if no endpoint is configured and a working no-JavaScript path.
+- **Theme choice** persists in a cookie and is restored before first paint.

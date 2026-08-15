@@ -1,8 +1,9 @@
 # Portfolio — Sourav Salampuria
 
 Next.js App Router · JavaScript · Tailwind CSS v4 · GSAP + ScrollTrigger · Framer Motion ·
-anime.js · lucide-react. No CMS, no database, no backend — content is local JSON. Every
-route is statically prerendered.
+anime.js · lucide-react. No CMS and no database — content is local JSON. Every page is
+statically prerendered; the only server code is `/api/contact`, a single route handler that
+relays the contact form through Resend.
 
 **Read [NEEDS-CONTENT.md](NEEDS-CONTENT.md) first.** It covers deployment and the couple of
 things a script cannot check.
@@ -14,7 +15,7 @@ npm run build
 npm start
 
 npm run lint           # ESLint CLI, next/core-web-vitals
-npm run verify         # 211 behavioural checks in real Chrome
+npm run verify         # 212 behavioural checks in real Chrome
 npm run verify:motion  # only the motion suites
 npm run check          # external links in site.json
 ```
@@ -84,9 +85,16 @@ fixed colour any more.
 One deliberate exception to "all four differ": the marquee pills share the card tone, because
 they sit on the page ground and need to lift off it rather than sink into it.
 
-**The choice is not persisted.** The spec forbids browser storage, so it holds for the
-session and across client-side navigation, and a hard reload falls back to the OS
-preference. That is a deliberate constraint.
+**The choice persists in a cookie.** The toggle writes `theme=light|dark` for a year, and a
+blocking script in `layout.js` reads it and stamps `data-theme` on `<html>` before the first
+paint — so a returning visitor never sees the wrong theme flash and correct itself. No
+cookie means no explicit choice, and `prefers-color-scheme` decides.
+
+A cookie rather than `localStorage`: the spec rules out browser storage, and a cookie is the
+narrower tool — one token, no identifier, an expiry of its own, and the only mechanism a
+server-rendered page could read ahead of paint. Reading it via `next/headers` would have
+worked too, and would have made every route dynamically rendered; the pre-paint script keeps
+them all static.
 
 ## Motion gating
 
@@ -112,7 +120,7 @@ and the shimmer behind it, so the box is the same size at every width.
 feature explicitly. Without that, `.js-motion` never applies and the suite passes while
 testing nothing.
 
-**211/211 checks pass**, covering:
+**212/212 checks pass**, covering:
 
 - No horizontal scroll at 320 / 375 / 480 / 700 / 768 / 1024 / 1280 / 1440 on all five entries (the four routes plus the 404 page), after a full scroll pass, with a clean console at each
 - Every `[data-reveal]` reaches opacity 1 on all four routes at three widths
@@ -126,7 +134,7 @@ testing nothing.
 - One `<main>`, one `<h1>`, header/footer landmarks
 - No font weight above 600, no box shadows except the specified node-dot ring, every heading full stop is the accent colour, and no second accent anywhere
 - No TODO marker reaches the delivered HTML
-- Theme: defaults dark, toggles to light and back, accent darkens, ground/card/terminal/chip are four distinct surfaces in **both** themes, the terminal re-themes with the page, `prefers-color-scheme: light` is honoured, and light-mode ink and accent both clear 4.5:1
+- Theme: defaults dark, toggles to light and back, accent darkens, ground/card/terminal/chip are four distinct surfaces in **both** themes, the terminal re-themes with the page, the choice **survives a hard reload**, `prefers-color-scheme: light` is honoured with no cookie set, and light-mode ink and accent both clear 4.5:1
 - JS disabled: nothing invisible, content present on all four routes
 
 ### Lighthouse
@@ -182,12 +190,42 @@ src/
   lib/            gsap.js (loader) · motion.js (vocabulary + gates) · stops.js (green full stops)
                   rich.js (backtick → mono) · todo.js (visible TODO markers)
 scripts/
-  verify.mjs        the 211-check browser matrix
+  verify.mjs        the 212-check browser matrix
   check-links.mjs   every external URL in site.json
 ```
 
 `puppeteer-core` and `eslint` are the only devDependencies beyond Tailwind; puppeteer drives
 your installed Chrome rather than downloading its own.
+
+## Contact form
+
+`/api/contact` is a route handler that validates server-side and sends through Resend, with
+`replyTo` set to the visitor so replying goes to them rather than to the sender address.
+
+The form carries a real `action` and `method`, so it works with JavaScript disabled — the
+route answers a form-encoded POST with a 303 back to `/?sent=ok#contact` and a JSON POST with
+JSON. Everything else about the two paths is identical, including the validation.
+
+With no endpoint configured it falls back to composing a `mailto:` draft, which works with no
+service at all but cannot tell the visitor whether anything was received.
+
+## Environment
+
+Two variables, needed only by `/api/contact`. Everything else builds and runs without them.
+
+```
+RESEND_API_KEY    from resend.com → API Keys
+CONTACT_FROM      e.g. Portfolio <onboarding@resend.dev>
+```
+
+Locally they go in `.env.local`, which is gitignored. In production they are set in Vercel
+under Settings → Environment Variables, for Production, Preview and Development.
+
+**Vercel bakes environment variables into a deployment at build time.** Saving one does not
+change a deployment that already exists — redeploy afterwards or the function will not see
+it. Without `RESEND_API_KEY` the route returns 500 and logs
+`RESEND_API_KEY is not set; contact form cannot send.`, which is the string to search the
+runtime logs for.
 
 ## Deploy
 
@@ -195,3 +233,7 @@ Vercel, zero config. `baseUrl` in `src/content/site.json` is already set to the 
 repo name is expected to produce — it feeds `metadataBase`, canonicals, `sitemap.xml` and
 `robots.txt`. Confirm it matches the URL Vercel actually assigns after the first deploy, and
 correct it if the repo ended up named differently.
+
+A `.vercel.app` subdomain is global and first-come — check the one you are about to claim is
+not already someone else's site before writing it into `baseUrl`, or every canonical on the
+site will point at a stranger's page.
