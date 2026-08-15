@@ -100,6 +100,30 @@ export default function ChapterArticle({ doc }) {
                   )}
                 </div>
 
+                {/* Box-drawing rather than an image: it re-themes with the page,
+                    needs no asset, and stays legible with JS off. `role="img"`
+                    plus a label means a screen reader hears one sentence instead
+                    of several hundred line-drawing characters. The scroll lives
+                    on the wrapper, so a wide diagram never widens the page. */}
+                {chapter.diagrams?.length ? (
+                  <div className="mt-8 space-y-6">
+                    {chapter.diagrams.map((diagram) => (
+                      <figure key={diagram.label} className="m-0">
+                        <figcaption className="micro">{diagram.label}</figcaption>
+                        <div className="card mt-3 overflow-x-auto p-5">
+                          <pre
+                            role="img"
+                            aria-label={diagram.alt}
+                            className="mono m-0 text-[12px] leading-[1.75] whitespace-pre"
+                          >
+                            {diagram.art}
+                          </pre>
+                        </div>
+                      </figure>
+                    ))}
+                  </div>
+                ) : null}
+
                 {chapter.tradeoff ? (
                   <div className="card mt-8 p-5 sm:p-6">
                     <p className="micro">Tradeoff</p>
