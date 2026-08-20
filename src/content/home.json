@@ -96,23 +96,8 @@
       "So I break my own systems on purpose. I scale a deployment by hand against a live cluster to see whether reconciliation actually reverts it, because a controller that has never been contradicted looks exactly like one that cannot be. What I publish is not the claim. It is the test, the result, and the list of cases the test does not cover."
     ]
   },
-  "marquee": {
-    "items": [
-      "Go",
-      "Kubernetes",
-      "Docker",
-      "Helm",
-      "Argo CD",
-      "Prometheus",
-      "Grafana",
-      "Loki",
-      "GitHub Actions",
-      "PostgreSQL",
-      "MySQL",
-      "Bash",
-      "Linux",
-      "KIND"
-    ]
+  "orbit": {
+    "lead": "Built, broken and measured with these"
   },
   "work": {
     "label": "003 / timeline",

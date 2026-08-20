@@ -27,7 +27,7 @@ const args = Object.fromEntries(
     return [k, v ?? true];
   })
 );
-const MOTION_SUITES = ['reveal', 'timeline', 'parallax', 'terminal', 'rail', 'marquee', 'reduced'];
+const MOTION_SUITES = ['reveal', 'timeline', 'parallax', 'terminal', 'rail', 'orbit', 'reduced'];
 const WANTED = args.motion ? MOTION_SUITES : args.only ? String(args.only).split(',').map((s) => s.trim()) : null;
 const wants = (s) => !WANTED || WANTED.includes(s);
 
@@ -350,27 +350,82 @@ if (suite('rail')) {
   }
 }
 
-/* ------------------------------------------------------------- marquee ---- */
-if (suite('marquee')) {
+/* --------------------------------------------------------------- orbit ---- */
+if (suite('orbit')) {
   const page = await newPage({ width: 1440 });
   await page.goto(BASE + '/', { waitUntil: 'networkidle0' });
-  const m = await page.evaluate(async () => {
-    const track = document.querySelector('.marquee-track');
-    const read = () => getComputedStyle(track).transform;
-    const a = read();
+
+  const o = await page.evaluate(async () => {
+    const ring = document.querySelector('.orbit-ring');
+    const icon = document.querySelector('.orbit-icon');
+    const read = () => getComputedStyle(ring).transform;
+    const before = read();
     await new Promise((r) => setTimeout(r, 900));
-    return { moved: a !== read(), duration: getComputedStyle(track).animationDuration };
+    const dots = [...document.querySelectorAll('.orbit-item')];
+    const centres = dots.map((d) => {
+      const r = d.getBoundingClientRect();
+      return Math.round(r.left + r.width / 2) + ',' + Math.round(r.top + r.height / 2);
+    });
+    return {
+      moved: before !== read(),
+      ringDuration: getComputedStyle(ring).animationDuration,
+      iconDuration: getComputedStyle(icon).animationDuration,
+      ringName: getComputedStyle(ring).animationName,
+      iconName: getComputedStyle(icon).animationName,
+      dots: dots.length,
+      distinct: new Set(centres).size,
+      logos: document.querySelectorAll('.orbit-icon svg path').length,
+      labels: document.querySelectorAll('.sr-only li').length,
+    };
   });
-  note(m.moved, 'marquee is animating', JSON.stringify(m));
-  note(m.duration === '44s', 'marquee runs at 44s', m.duration);
+
+  note(o.moved, 'orbit is rotating', o.ringName);
+  note(o.dots === 12, 'twelve marks in the ring', String(o.dots));
+  note(o.logos === 12, 'every mark carries a logo path', String(o.logos));
+  // Counter-rotation only cancels out if both run for exactly the same time.
+  note(
+    o.ringDuration === o.iconDuration,
+    'logos counter-rotate at the ring speed so they stay upright',
+    o.ringDuration + ' vs ' + o.iconDuration
+  );
+  note(o.iconName !== o.ringName, 'ring and logos run opposite keyframes', o.iconName);
+  // Every dot on its own point of the circle — a broken calc() stacks them.
+  note(o.distinct === o.dots, 'no two marks share a position', o.distinct + '/' + o.dots);
+  note(o.labels === 12, 'the stack is listed for assistive tech', String(o.labels));
   await page.close();
 
-  const narrow = await newPage({ width: 400, touch: true });
+  // The ring is sized in vw, so the narrowest viewport is where it would burst
+  // the container if the radius maths were wrong.
+  const narrow = await newPage({ width: 320, touch: true });
   await narrow.goto(BASE + '/', { waitUntil: 'networkidle0' });
-  const d = await narrow.evaluate(
-    () => getComputedStyle(document.querySelector('.marquee-track')).animationDuration
-  );
-  note(d === '31s', 'marquee 30% faster below 480px', d);
+  const fits = await narrow.evaluate(() => {
+    const orbit = document.querySelector('.orbit');
+    const box = orbit.getBoundingClientRect();
+    const dots = [...document.querySelectorAll('.orbit-item')].map((d) => d.getBoundingClientRect());
+    return {
+      within: dots.every((d) => d.left >= box.left - 1 && d.right <= box.right + 1),
+      width: Math.round(box.width),
+      viewport: window.innerWidth,
+    };
+  });
+  // The ring passing its own bounds is not the failure that nearly shipped:
+  // the copy grew until it sat against the marks while every box check still
+  // passed. Measure the actual clearance instead.
+  const clearance = await narrow.evaluate(() => {
+    const c = document.querySelector('.orbit-center').getBoundingClientRect();
+    let min = Infinity;
+    for (const dot of document.querySelectorAll('.orbit-item')) {
+      const r = dot.getBoundingClientRect();
+      const dx = Math.max(r.left - c.right, c.left - r.right, 0);
+      const dy = Math.max(r.top - c.bottom, c.top - r.bottom, 0);
+      if (dx === 0 && dy === 0) return -1;
+      min = Math.min(min, Math.hypot(dx, dy));
+    }
+    return Math.round(min);
+  });
+  note(clearance >= 8, 'copy keeps clear of the marks at 320px', clearance + 'px');
+  note(fits.within, 'every mark stays inside the ring box at 320px', String(fits.within));
+  note(fits.width <= fits.viewport, 'ring is never wider than the viewport', fits.width + '<=' + fits.viewport);
   await narrow.close();
 }
 
@@ -388,13 +443,13 @@ if (suite('reduced')) {
       const parallax = [...document.querySelectorAll('[data-parallax]')].filter(
         (el) => getComputedStyle(el).transform !== 'none'
       ).length;
-      const track = document.querySelector('.marquee-track');
+      const ring = document.querySelector('.orbit-ring');
       const chars = [...document.querySelectorAll('[data-char]')];
       return {
         motionClass: document.documentElement.classList.contains('js-motion'),
         hidden,
         parallax,
-        marqueeStopped: track ? getComputedStyle(track).animationName === 'none' : true,
+        orbitStopped: ring ? getComputedStyle(ring).animationName === 'none' : true,
         hiddenChars: chars.filter((c) => parseFloat(getComputedStyle(c).opacity) < 0.99).length,
         // Under reduced motion the intro is never split into spans at all, so
         // assert the text itself rather than counting characters — otherwise
@@ -405,7 +460,7 @@ if (suite('reduced')) {
     note(!s.motionClass, `RM ${path}: js-motion absent`);
     note(s.hidden === 0, `RM ${path}: nothing below opacity 1`, `${s.hidden}`);
     note(s.parallax === 0, `RM ${path}: parallax at zero`, `${s.parallax}`);
-    note(s.marqueeStopped, `RM ${path}: marquee stopped`);
+    note(s.orbitStopped, `RM ${path}: orbit stopped`);
     note(s.hiddenChars === 0, `RM ${path}: no character left hidden`, `${s.hiddenChars}`);
     if (path === '/') {
       note(
@@ -562,7 +617,7 @@ if (suite('theme')) {
         bodyBg: getComputedStyle(document.body).backgroundColor,
         terminalBg: getComputedStyle(terminal).backgroundColor,
         cardBg: getComputedStyle(document.querySelector('.card')).backgroundColor,
-        // The inset chip (--bg-3), not the marquee pill: that one deliberately
+        // The inset chip (--bg-3), not the orbit mark: that one deliberately
         // shares the card tone so it lifts off the page ground.
         chipBg: getComputedStyle(document.querySelector('.chip')).backgroundColor,
       };

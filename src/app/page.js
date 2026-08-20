@@ -1,14 +1,14 @@
 import ContactForm from '@/components/ContactForm';
 import Hero from '@/components/Hero';
 import Manifesto from '@/components/Manifesto';
-import Marquee from '@/components/Marquee';
+import Orbit from '@/components/Orbit';
 import Timeline from '@/components/Timeline';
 import home from '@/content/home.json';
 import timeline from '@/content/timeline.json';
 
 /**
  * Home, in order:
- *   nav (layout) · hero + terminal · manifesto · marquee · timeline ·
+ *   nav (layout) · hero + terminal · manifesto · orbit · timeline ·
  *   contact · footer (layout)
  */
 export default function HomePage() {
@@ -18,7 +18,7 @@ export default function HomePage() {
 
       <Manifesto manifesto={home.manifesto} />
 
-      <Marquee items={home.marquee.items} />
+      <Orbit orbit={home.orbit} />
 
       <Timeline
         label={home.work.label}

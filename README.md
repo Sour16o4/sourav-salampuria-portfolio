@@ -15,7 +15,7 @@ npm run build
 npm start
 
 npm run lint           # ESLint CLI, next/core-web-vitals
-npm run verify         # 212 behavioural checks in real Chrome
+npm run verify         # 219 behavioural checks in real Chrome
 npm run verify:motion  # only the motion suites
 npm run check          # external links in site.json
 ```
@@ -82,7 +82,7 @@ panel, but it is the same material as everything else — a black rectangle sitt
 paper looked like a foreign object, which is exactly what it was. Nothing on the site is a
 fixed colour any more.
 
-One deliberate exception to "all four differ": the marquee pills share the card tone, because
+One deliberate exception to "all four differ": the orbit marks share the card tone, because
 they sit on the page ground and need to lift off it rather than sink into it.
 
 **The choice persists in a cookie.** The toggle writes `theme=light|dark` for a year, and a
@@ -120,7 +120,7 @@ and the shimmer behind it, so the box is the same size at every width.
 feature explicitly. Without that, `.js-motion` never applies and the suite passes while
 testing nothing.
 
-**212/212 checks pass**, covering:
+**219/219 checks pass**, covering:
 
 - No horizontal scroll at 320 / 375 / 480 / 700 / 768 / 1024 / 1280 / 1440 on all five entries (the four routes plus the 404 page), after a full scroll pass, with a clean console at each
 - Every `[data-reveal]` reaches opacity 1 on all four routes at three widths
@@ -128,8 +128,8 @@ testing nothing.
 - Parallax off below 480, active above, travel within the 60px cap
 - Terminal: typewriter completes with no character left hidden; `help`, `ls`, `whoami`, unknown-command and `clear` all work; **panel height is byte-identical before and after output** (zero CLS)
 - Reading-progress bar fills on both chapter routes
-- Marquee animates at 44s, and 31s below 480px
-- Reduced motion on every route: no `.js-motion`, nothing below opacity 1, parallax zeroed, marquee stopped, typewriter printed in full
+- Orbit rotates, twelve marks each on their own point of the circle, logos counter-rotating at the ring speed so they stay upright, the whole ring inside the viewport at 320px and the copy clear of the marks
+- Reduced motion on every route: no `.js-motion`, nothing below opacity 1, parallax zeroed, orbit stopped, typewriter printed in full
 - Full tab order walked on every route at 375 and 1280: every stop has a focus ring, and stops reached matches focusable controls
 - One `<main>`, one `<h1>`, header/footer landmarks
 - No font weight above 600, no box shadows except the specified node-dot ring, every heading full stop is the accent colour, and no second accent anywhere
@@ -190,7 +190,7 @@ src/
   lib/            gsap.js (loader) · motion.js (vocabulary + gates) · stops.js (green full stops)
                   rich.js (backtick → mono) · todo.js (visible TODO markers)
 scripts/
-  verify.mjs        the 212-check browser matrix
+  verify.mjs        the 219-check browser matrix
   check-links.mjs   every external URL in site.json
 ```
 
