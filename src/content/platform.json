@@ -13,49 +13,8 @@
         "The first thing worth saying is what is *not* here. There is no cloud load balancer, because KIND has none to offer — the cluster is three Docker containers on one machine. `kind-config.yaml` binds host port 80 straight into the control-plane container and labels that node `ingress-ready=true`, which is the hook the NGINX ingress controller is scheduled against. That single line is what makes `localhost` resolve to a real ingress rather than to nothing.",
         "The second is the boundary between the three. The application, its chart and the wiring all live in this repository. The stack the wiring assumes — the Prometheus Operator, Grafana and its sidecar, Loki and Promtail — is installed alongside it as separate Helm releases. That is why the chart renders a `ServiceMonitor` it cannot itself satisfy: the resource is a contract with an operator that has to already be there."
       ],
-      "tradeoff": "Every arrow above is one machine. The ingress path works because a Docker port binding happens to land on the node the controller was scheduled to, and that is a property of this laptop rather than of the design. Nothing here has been tested against a second node failing, a real load balancer, or a network that can partition — so the diagram is an accurate map of what runs, and not evidence that the shape survives anywhere else.",
+      "tradeoff": "Every box and arrow above is one machine. The ingress path works because a Docker port binding happens to land on the node the controller was scheduled to, and that is a property of this laptop rather than of the design. Nothing here has been tested against a second node failing, a real load balancer, or a network that can partition — so the diagram is an accurate map of what runs, and not evidence that the shape survives anywhere else.",
       "flows": [
-        {
-          "label": "Request · browser to pod",
-          "steps": [
-            {
-              "node": "Browser",
-              "meta": [
-                "GET http://localhost"
-              ]
-            },
-            {
-              "node": "KIND node · control-plane",
-              "via": "docker port binding",
-              "meta": [
-                "hostPort 80 → containerPort 80",
-                "listenAddress 127.0.0.1",
-                "node-labels: ingress-ready=true"
-              ]
-            },
-            {
-              "node": "NGINX Ingress Controller",
-              "meta": [
-                "ingressClassName: nginx",
-                "host: localhost · path: / (Prefix)"
-              ]
-            },
-            {
-              "node": "Service demo-app",
-              "meta": [
-                "type: ClusterIP",
-                "port 80 → targetPort 8080"
-              ]
-            },
-            {
-              "node": "Pod × 2",
-              "meta": [
-                "Go net/http on :8080",
-                "/ · /health · /metrics"
-              ]
-            }
-          ]
-        },
         {
           "label": "Observability · two paths into one dashboard",
           "lanes": [
@@ -158,7 +117,66 @@
             }
           ]
         }
-      ]
+      ],
+      "topology": {
+        "label": "Where it runs · the numbers follow one request",
+        "root": {
+          "name": "your machine",
+          "hop": "01",
+          "meta": [
+            "Docker Desktop",
+            "a browser asks for http://localhost"
+          ],
+          "children": [
+            {
+              "name": "KIND cluster",
+              "meta": [
+                "3 nodes, each one a Docker container",
+                "no cloud load balancer exists here to ask for"
+              ],
+              "children": [
+                {
+                  "name": "control-plane node",
+                  "hop": "02",
+                  "meta": [
+                    "hostPort 80 → containerPort 80",
+                    "listenAddress 127.0.0.1 — localhost only",
+                    "node-labels: ingress-ready=true"
+                  ],
+                  "children": [
+                    {
+                      "name": "NGINX Ingress Controller",
+                      "hop": "03",
+                      "meta": [
+                        "scheduled here by that label",
+                        "ingressClassName: nginx",
+                        "rule: host localhost · path / (Prefix)"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "worker node × 2",
+                  "meta": [
+                    "where the application pods schedule"
+                  ],
+                  "children": [
+                    {
+                      "name": "Pod demo-app × 2",
+                      "hop": "04",
+                      "meta": [
+                        "Go net/http on :8080",
+                        "/ · /health · /metrics"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "note": "Between 03 and 04 sits the Service, which is not inside any node — it is a cluster-scoped ClusterIP that gives the two pods one stable address, taking :80 and forwarding to targetPort 8080. The Ingress rule is cluster-scoped too. Both are routing objects rather than things that run somewhere, which is why neither has a box."
+      }
     },
     {
       "id": "monitoring",

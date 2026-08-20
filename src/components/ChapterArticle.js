@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 
 import FlowDiagram from '@/components/FlowDiagram';
 import ReadingProgress from '@/components/ReadingProgress';
+import Topology from '@/components/Topology';
 import Reveal from '@/components/Reveal';
 import site from '@/content/site.json';
 import { Rich } from '@/lib/rich';
@@ -101,6 +102,12 @@ export default function ChapterArticle({ doc }) {
                   )}
                 </div>
 
+                {chapter.topology ? (
+                  <div className="mt-8">
+                    <Topology topology={chapter.topology} />
+                  </div>
+                ) : null}
+
                 {chapter.flows?.length ? (
                   <div className="mt-8 space-y-8">
                     {chapter.flows.map((flow) => (
@@ -109,8 +116,12 @@ export default function ChapterArticle({ doc }) {
                   </div>
                 ) : null}
 
+                {/* An aside, not a container. A full card gave every chapter a
+                    second boxed block competing with the diagrams above it; a
+                    rule in the accent marks it as a turn in the argument and
+                    lets the text sit on the page like the prose it is. */}
                 {chapter.tradeoff ? (
-                  <div className="card mt-8 p-5 sm:p-6">
+                  <div className="mt-8 border-l-2 border-acc pl-5 sm:pl-6">
                     <p className="micro">Tradeoff</p>
                     {isTodo(chapter.tradeoff) ? (
                       <div className="mt-3">
