@@ -13,24 +13,152 @@
         "The first thing worth saying is what is *not* here. There is no cloud load balancer, because KIND has none to offer — the cluster is three Docker containers on one machine. `kind-config.yaml` binds host port 80 straight into the control-plane container and labels that node `ingress-ready=true`, which is the hook the NGINX ingress controller is scheduled against. That single line is what makes `localhost` resolve to a real ingress rather than to nothing.",
         "The second is the boundary between the three. The application, its chart and the wiring all live in this repository. The stack the wiring assumes — the Prometheus Operator, Grafana and its sidecar, Loki and Promtail — is installed alongside it as separate Helm releases. That is why the chart renders a `ServiceMonitor` it cannot itself satisfy: the resource is a contract with an operator that has to already be there."
       ],
-      "diagrams": [
+      "tradeoff": "Every arrow above is one machine. The ingress path works because a Docker port binding happens to land on the node the controller was scheduled to, and that is a property of this laptop rather than of the design. Nothing here has been tested against a second node failing, a real load balancer, or a network that can partition — so the diagram is an accurate map of what runs, and not evidence that the shape survives anywhere else.",
+      "flows": [
         {
           "label": "Request · browser to pod",
-          "alt": "A browser request to localhost port 80 enters the KIND control-plane container through a host port mapping, reaches the NGINX ingress controller, matches the ingress rule for host localhost on path slash, is routed to the demo-app ClusterIP service on port 80, and is forwarded to target port 8080 on one of two pods running the Go server.",
-          "art": "  browser                    KIND node · control-plane\n  ───────                    node-labels: ingress-ready=true\n\n  localhost:80 ──▶ hostPort 80 ──▶ NGINX Ingress\n                   (127.0.0.1)        │  ingressClassName: nginx\n                                      │  host: localhost\n                                      │  path: /  (Prefix)\n                                      ▼\n                                   Service demo-app\n                                      │  ClusterIP\n                                      │  :80 ──▶ targetPort 8080\n                                      ▼\n                                   Pod × 2 · Go net/http :8080\n                                      /        200\n                                      /health  liveness + readiness\n                                      /metrics promhttp"
+          "steps": [
+            {
+              "node": "Browser",
+              "meta": [
+                "GET http://localhost"
+              ]
+            },
+            {
+              "node": "KIND node · control-plane",
+              "via": "docker port binding",
+              "meta": [
+                "hostPort 80 → containerPort 80",
+                "listenAddress 127.0.0.1",
+                "node-labels: ingress-ready=true"
+              ]
+            },
+            {
+              "node": "NGINX Ingress Controller",
+              "meta": [
+                "ingressClassName: nginx",
+                "host: localhost · path: / (Prefix)"
+              ]
+            },
+            {
+              "node": "Service demo-app",
+              "meta": [
+                "type: ClusterIP",
+                "port 80 → targetPort 8080"
+              ]
+            },
+            {
+              "node": "Pod × 2",
+              "meta": [
+                "Go net/http on :8080",
+                "/ · /health · /metrics"
+              ]
+            }
+          ]
         },
         {
-          "label": "Scrape · metrics and logs to Grafana",
-          "alt": "A ServiceMonitor with a 15 second interval on the metrics path tells the Prometheus Operator to scrape the demo-app service. Prometheus stores http_requests_total and http_request_duration_seconds. Promtail tails pod logs and ships them to Loki. Grafana reads both, with its dashboard and Loki datasource imported from ConfigMaps carrying the sidecar label.",
-          "art": "  ServiceMonitor  interval 15s · path /metrics\n        │         selector release: prometheus-stack\n        ▼\n  Prometheus ──scrape──▶ Service demo-app ──▶ Pod :8080/metrics\n        │                        http_requests_total\n        │                        http_request_duration_seconds\n        │\n        │                Promtail ──tail──▶ Pod stdout\n        │                    │\n        │                    ▼\n        │                  Loki  :3100\n        ▼                    │\n     Grafana ◀───────────────┘\n        ▲\n        └── ConfigMaps · sidecar label\n              RED dashboard · Loki datasource"
+          "label": "Observability · two paths into one dashboard",
+          "lanes": [
+            {
+              "title": "metrics",
+              "steps": [
+                {
+                  "node": "ServiceMonitor",
+                  "meta": [
+                    "interval 15s · path /metrics",
+                    "selector release: prometheus-stack"
+                  ]
+                },
+                {
+                  "node": "Prometheus",
+                  "via": "scrapes",
+                  "meta": [
+                    "http_requests_total",
+                    "http_request_duration_seconds"
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "logs",
+              "steps": [
+                {
+                  "node": "Promtail",
+                  "meta": [
+                    "tails pod stdout"
+                  ]
+                },
+                {
+                  "node": "Loki",
+                  "via": "ships",
+                  "meta": [
+                    "single binary on :3100"
+                  ]
+                }
+              ]
+            }
+          ],
+          "merge": {
+            "node": "Grafana",
+            "via": "both read by",
+            "meta": [
+              "RED dashboard · Loki datasource",
+              "imported from ConfigMaps carrying the sidecar label"
+            ]
+          }
         },
         {
           "label": "Delivery · push to running pod",
-          "alt": "A push touching the app or helm directories triggers GitHub Actions, which validates manifests with kubeconform, lints the chart, runs Go tests with the race detector, builds the image without pushing, scans it with Trivy gating on CRITICAL, then pushes to GHCR. The workflow writes the new image tag into values.yaml and commits it back with skip ci, and ArgoCD syncs that change to the cluster with prune and self-heal enabled.",
-          "art": "  git push  (paths: app/** · helm/**)\n        │\n        ▼\n  GitHub Actions\n     kubeconform ──▶ helm lint ──▶ go test -race\n        │\n        ▼\n     docker build  (push: false, load: true)\n        │\n        ▼\n     Trivy  severity CRITICAL · ignore-unfixed\n        │  fails here ──▶ nothing reaches the registry\n        ▼\n     push ghcr.io/…/demo-app:sha-<short>\n        │\n        ▼\n     sed tag into values.yaml ──▶ commit \"[skip ci]\" ──▶ push\n        │\n        ▼\n  ArgoCD  automated · prune · selfHeal\n        │\n        ▼\n  cluster"
+          "steps": [
+            {
+              "node": "git push",
+              "meta": [
+                "paths: app/** · helm/**"
+              ]
+            },
+            {
+              "node": "GitHub Actions",
+              "meta": [
+                "kubeconform → helm lint → go test -race"
+              ]
+            },
+            {
+              "node": "docker build",
+              "meta": [
+                "push: false · load: true",
+                "the image never leaves the runner yet"
+              ]
+            },
+            {
+              "node": "Trivy scan",
+              "via": "the gate",
+              "meta": [
+                "severity CRITICAL · ignore-unfixed",
+                "fails here and nothing reaches the registry"
+              ]
+            },
+            {
+              "node": "Push to GHCR",
+              "meta": [
+                "ghcr.io/…/demo-app:sha-<short>"
+              ]
+            },
+            {
+              "node": "Write the tag back",
+              "meta": [
+                "sed into helm/demo-app/values.yaml",
+                "commit \"[skip ci]\" → push"
+              ]
+            },
+            {
+              "node": "ArgoCD syncs the cluster",
+              "meta": [
+                "automated · prune · selfHeal"
+              ]
+            }
+          ]
         }
-      ],
-      "tradeoff": "Every arrow above is one machine. The ingress path works because a Docker port binding happens to land on the node the controller was scheduled to, and that is a property of this laptop rather than of the design. Nothing here has been tested against a second node failing, a real load balancer, or a network that can partition — so the diagram is an accurate map of what runs, and not evidence that the shape survives anywhere else."
+      ]
     },
     {
       "id": "monitoring",

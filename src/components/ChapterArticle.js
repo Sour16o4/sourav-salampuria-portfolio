@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
+import FlowDiagram from '@/components/FlowDiagram';
 import ReadingProgress from '@/components/ReadingProgress';
 import Reveal from '@/components/Reveal';
 import site from '@/content/site.json';
@@ -100,26 +101,10 @@ export default function ChapterArticle({ doc }) {
                   )}
                 </div>
 
-                {/* Box-drawing rather than an image: it re-themes with the page,
-                    needs no asset, and stays legible with JS off. `role="img"`
-                    plus a label means a screen reader hears one sentence instead
-                    of several hundred line-drawing characters. The scroll lives
-                    on the wrapper, so a wide diagram never widens the page. */}
-                {chapter.diagrams?.length ? (
-                  <div className="mt-8 space-y-6">
-                    {chapter.diagrams.map((diagram) => (
-                      <figure key={diagram.label} className="m-0">
-                        <figcaption className="micro">{diagram.label}</figcaption>
-                        <div className="card mt-3 overflow-x-auto p-5">
-                          <pre
-                            role="img"
-                            aria-label={diagram.alt}
-                            className="mono m-0 text-[12px] leading-[1.75] whitespace-pre"
-                          >
-                            {diagram.art}
-                          </pre>
-                        </div>
-                      </figure>
+                {chapter.flows?.length ? (
+                  <div className="mt-8 space-y-8">
+                    {chapter.flows.map((flow) => (
+                      <FlowDiagram key={flow.label} flow={flow} />
                     ))}
                   </div>
                 ) : null}
