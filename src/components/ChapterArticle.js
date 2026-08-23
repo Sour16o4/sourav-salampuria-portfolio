@@ -41,8 +41,12 @@ export default function ChapterArticle({ doc }) {
 
             <p className="t-lead mt-6 max-w-[68ch]">{doc.summary}</p>
 
+            {/* auto-fit, not a fixed four: with two metrics a four-column grid
+                left two empty tracks showing as a grey slab. auto-fit collapses
+                the tracks nothing lands in, so the row is always full whether
+                the page declares two figures or four. */}
             {doc.metrics?.length ? (
-              <dl className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-[7px] border border-faint bg-faint md:grid-cols-4">
+              <dl className="mt-12 grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-px overflow-hidden rounded-[7px] border border-faint bg-faint">
                 {doc.metrics.map((metric) => (
                   <div key={metric.id} className="flex flex-col bg-bg-2 p-5">
                     <dd className="order-1 m-0 flex items-baseline gap-1">

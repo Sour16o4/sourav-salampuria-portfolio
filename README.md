@@ -15,7 +15,7 @@ npm run build
 npm start
 
 npm run lint           # ESLint CLI, next/core-web-vitals
-npm run verify         # 219 behavioural checks in real Chrome
+npm run verify         # 220 behavioural checks in real Chrome
 npm run verify:motion  # only the motion suites
 npm run check          # external links in site.json
 ```
@@ -120,7 +120,7 @@ and the shimmer behind it, so the box is the same size at every width.
 feature explicitly. Without that, `.js-motion` never applies and the suite passes while
 testing nothing.
 
-**219/219 checks pass**, covering:
+**220/220 checks pass**, covering:
 
 - No horizontal scroll at 320 / 375 / 480 / 700 / 768 / 1024 / 1280 / 1440 on all five entries (the four routes plus the 404 page), after a full scroll pass, with a clean console at each
 - Every `[data-reveal]` reaches opacity 1 on all four routes at three widths
@@ -133,7 +133,7 @@ testing nothing.
 - Full tab order walked on every route at 375 and 1280: every stop has a focus ring, and stops reached matches focusable controls
 - One `<main>`, one `<h1>`, header/footer landmarks
 - No font weight above 600, no box shadows except the specified node-dot ring, every heading full stop is the accent colour, and no second accent anywhere except the stack marks — carved out by selector, with a paired check that they really do still carry brand colours
-- No TODO marker reaches the delivered HTML
+- No TODO marker reaches the delivered HTML, and no empty tracks in the metric grid
 - Theme: defaults dark, toggles to light and back, accent darkens, ground/card/terminal/chip are four distinct surfaces in **both** themes, the terminal re-themes with the page, the choice **survives a hard reload**, `prefers-color-scheme: light` is honoured with no cookie set, and light-mode ink and accent both clear 4.5:1
 - JS disabled: nothing invisible, content present on all four routes
 
@@ -190,7 +190,7 @@ src/
   lib/            gsap.js (loader) · motion.js (vocabulary + gates) · stops.js (green full stops)
                   rich.js (backtick → mono) · todo.js (visible TODO markers)
 scripts/
-  verify.mjs        the 219-check browser matrix
+  verify.mjs        the 220-check browser matrix
   check-links.mjs   every external URL in site.json
 ```
 

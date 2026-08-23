@@ -582,6 +582,26 @@ if (suite('design')) {
   });
   note(chroma.length === 0, 'no second accent colour anywhere but the stack marks', chroma.slice(0, 5).join(' | '));
 
+  // A fixed four-column metric grid left two empty tracks rendering as a grey
+  // slab on any page declaring fewer than four figures. Every track that takes
+  // up width must hold a cell.
+  const metrics = await newPage({ width: 1280 });
+  await metrics.goto(BASE + '/book-api', { waitUntil: 'networkidle0' });
+  const grid = await metrics.evaluate(() => {
+    const dl = document.querySelector('#article dl');
+    if (!dl) return null;
+    const filled = getComputedStyle(dl)
+      .gridTemplateColumns.split(' ')
+      .filter((t) => parseFloat(t) > 0).length;
+    return { filled, cells: dl.children.length };
+  });
+  await metrics.close();
+  note(
+    grid && grid.filled === grid.cells,
+    'no empty tracks in the metric grid',
+    grid ? grid.filled + ' tracks / ' + grid.cells + ' cells' : 'no grid found'
+  );
+
   // The carve-out above would hide a regression that emptied the marks of
   // colour, so check the thing it excuses actually still happens.
   const brands = await page.evaluate(() => {
