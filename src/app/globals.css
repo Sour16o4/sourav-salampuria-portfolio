@@ -41,8 +41,8 @@
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1440px;
 
-  --animate-orbit: orbit-spin 72s linear infinite;
-  --animate-orbit-back: orbit-spin-back 72s linear infinite;
+  --animate-orbit: orbit-spin 28s linear infinite;
+  --animate-orbit-back: orbit-spin-back 28s linear infinite;
   --animate-caret: caret 1.05s step-end infinite;
 
   @keyframes orbit-spin {
@@ -432,12 +432,17 @@
      overflowing it — the radius is inset by half a dot so nothing crosses the
      container edge. */
   .orbit {
-    --orbit-size: clamp(236px, 78vw, 400px);
-    --orbit-dot: clamp(34px, 10vw, 40px);
-    --orbit-r: calc(var(--orbit-size) / 2 - var(--orbit-dot) / 2);
+    --orbit-size: clamp(236px, 78vw, 440px);
+    --orbit-dot: clamp(34px, 10vw, 44px);
+    --orbit-r: calc(var(--orbit-size) / 2 - var(--orbit-dot) / 2 - 4px);
     position: relative;
     width: var(--orbit-size);
     height: var(--orbit-size);
+    /* The ring is a square that spins, so its axis-aligned box swells to the
+       diagonal at 45deg and pushed the page 48px wide at 1024. Its corners are
+       empty — every mark is inscribed within the square — so clipping to the
+       square hides nothing and stops the sweep from counting as layout. */
+    overflow: clip;
   }
 
   .orbit::before {
@@ -474,14 +479,14 @@
     border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
     border-radius: var(--radius-chip);
     background: var(--bg-2);
-    color: color-mix(in srgb, var(--ink) 62%, transparent);
+    color: var(--brand);
     animation: var(--animate-orbit-back);
-    transition: color 0.18s ease;
+    transition: transform 0.18s ease;
   }
 
   .orbit-icon svg {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -491,26 +496,10 @@
     }
 
     .orbit-icon:hover {
-      color: var(--ink);
+      transform: scale(1.12);
     }
   }
 
-  /* Kept clear of the marks by construction: the ring's inner edge is
-     --orbit-r minus half a dot, so the copy is capped below that with a gap
-     rather than trusting a percentage to stay clear at every width. */
-  .orbit-center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: calc((var(--orbit-r) - var(--orbit-dot)) * 2 - 16px);
-    margin: 0;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    font-size: clamp(11.5px, 2.9vw, 16px);
-    line-height: 1.4;
-    text-wrap: balance;
-    color: var(--ink);
-  }
 
   /* ----------------------------------------------------------- timeline -- */
   .spine {

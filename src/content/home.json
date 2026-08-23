@@ -97,7 +97,8 @@
     ]
   },
   "orbit": {
-    "lead": "Built, broken and measured with these"
+    "heading": "What it is made of",
+    "lead": "Every claim on this site was built, broken and measured with these. Nothing here is on the list because it looked good on a CV."
   },
   "work": {
     "label": "003 / timeline",

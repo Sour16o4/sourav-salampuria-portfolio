@@ -128,11 +128,11 @@ testing nothing.
 - Parallax off below 480, active above, travel within the 60px cap
 - Terminal: typewriter completes with no character left hidden; `help`, `ls`, `whoami`, unknown-command and `clear` all work; **panel height is byte-identical before and after output** (zero CLS)
 - Reading-progress bar fills on both chapter routes
-- Orbit rotates, twelve marks each on their own point of the circle, logos counter-rotating at the ring speed so they stay upright, the whole ring inside the viewport at 320px and the copy clear of the marks
+- Orbit rotates at 28s, twelve marks each on their own point of the circle, logos counter-rotating at the ring speed so they stay upright, each carrying its own brand colour, and the whole ring inside the viewport at 320px
 - Reduced motion on every route: no `.js-motion`, nothing below opacity 1, parallax zeroed, orbit stopped, typewriter printed in full
 - Full tab order walked on every route at 375 and 1280: every stop has a focus ring, and stops reached matches focusable controls
 - One `<main>`, one `<h1>`, header/footer landmarks
-- No font weight above 600, no box shadows except the specified node-dot ring, every heading full stop is the accent colour, and no second accent anywhere
+- No font weight above 600, no box shadows except the specified node-dot ring, every heading full stop is the accent colour, and no second accent anywhere except the stack marks — carved out by selector, with a paired check that they really do still carry brand colours
 - No TODO marker reaches the delivered HTML
 - Theme: defaults dark, toggles to light and back, accent darkens, ground/card/terminal/chip are four distinct surfaces in **both** themes, the terminal re-themes with the page, the choice **survives a hard reload**, `prefers-color-scheme: light` is honoured with no cookie set, and light-mode ink and accent both clear 4.5:1
 - JS disabled: nothing invisible, content present on all four routes
