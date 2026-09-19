@@ -1,0 +1,65 @@
+{
+  "title": "tenantguard",
+  "kicker": "Open source · 2026",
+  "summary": "A multi-tenant isolation verifier for Go applications backed by PostgreSQL. It gives the database a synthesised row-level-security policy, replays captured traffic under it, and diffs the row sets — so a leak is a proven fact about what Postgres would have withheld, never a heuristic about what the SQL text looks like.",
+
+  "sourceKey": "tenantguardSource",
+  "sourceLabel": "Source on GitHub →",
+
+  "metrics": [
+    { "id": "tiers", "value": "3", "unit": "", "label": "triage · differential · guardrail" },
+    { "id": "leaks", "value": "37", "unit": "", "label": "LEAK-shaped verdicts on coder" },
+    { "id": "targets", "value": "2", "unit": "", "label": "real third-party validation targets" }
+  ],
+
+  "chapters": [
+    {
+      "id": "thesis",
+      "title": "Postgres is the oracle, not a parser",
+      "paragraphs": [
+        "The thesis is one sentence: PostgreSQL already decides what a query should have been allowed to return, and nothing about that decision requires a second implementation of SQL semantics living in this tool. Give the database a synthesised row-level-security policy for the declared tenant columns, replay each captured query a second time under that policy, and diff the two row sets. A row the application received that RLS would have withheld is a proven leak, not a suggestion of one.",
+        "The alternative — a SQL parser walking the query text looking for a `WHERE tenant_id = ?` clause — fails structurally, not occasionally. Joins, CTEs, views and subqueries all defeat naive text matching, and a query scoped to the *wrong* tenant is syntactically perfect: no parser can catch a value error by reading grammar. PostgreSQL evaluates the actual semantics, so it can."
+      ],
+      "tradeoff": "Committing to Postgres-as-oracle means the tool is Postgres-only by construction, not by an unfinished roadmap. Shared-schema tenancy with a single tenant column is the whole model — schema-per-tenant and database-per-tenant tenancy are a different detection problem this tool does not attempt."
+    },
+    {
+      "id": "tiers",
+      "title": "Three tiers, three different proof strengths",
+      "paragraphs": [
+        "Tier 0, `triage`, needs nothing but a Go repository — no database, no traffic. It scans for SQL against likely tenant-scoped tables and flags statements with no mention of the tenant column anywhere in their text. It never exits non-zero and it never claims to have found a leak, only a ranked list of suspicions worth pointing Tier 1 at.",
+        "Tier 1, `differential`, is where a real verdict happens. It needs a declared tenancy policy (`infer`'s output, reviewed by a human — the tool never trusts its own inference automatically), and real traffic seeded by at least two tenants in the same scoped table. That second tenant is not a nicety: a single-tenant seed makes the restricted and unrestricted row sets identical by construction, which would make every query report `SAFE` regardless of whether the isolation is real.",
+        "Tier 2, `guardrail`, is the one class Tier 1 structurally cannot catch: a query whose predicate is syntactically correct but bound to the wrong tenant value. Nothing at Tier 1 has independent ground truth for which tenant a query *should* have targeted beyond the value already sitting in its own text. Tier 2 requires actual application changes — tenant-context propagation, a driver wrapper — and exists today as a demonstrated mechanism in `internal/guardrail`, not a turnkey CLI feature."
+      ],
+      "tradeoff": "Naming three tiers up front is also naming what is not built yet. Tier 2 is real code, exercised in tests, but it is not something you point at your own app and get results from the way `verify` and `audit` already are — the README says this plainly rather than letting the CLI's existence imply otherwise."
+    },
+    {
+      "id": "oracle",
+      "title": "Trusting the oracle before trusting its verdicts",
+      "paragraphs": [
+        "The most dangerous failure mode for a tool like this is not a false leak — it is a false `SAFE` produced because the oracle itself was blind, not because the application was actually clean. `internal/oracle` exists entirely to make that specific failure impossible: before any real query is judged, the probe database has to pass four self-checks, and if it doesn't, the run aborts with no report at all rather than a report built on an untrustworthy foundation.",
+        "A1 is the core one: seed two canary tenants, then confirm that a role restricted by the synthesised policy actually sees fewer rows than an unrestricted role does. If it doesn't, the oracle cannot see anything and nothing downstream means anything. A2 checks that every table classified `Scoped` actually has an enabled, matching RLS policy attached — Postgres allows a table to have RLS turned on with no policy, or a policy defined but RLS off, and either half without the other leaves the table silently unprotected. A3 checks that the connecting role itself cannot bypass RLS — superuser, `BYPASSRLS`, or ownership of a non-`FORCE`d table all make every synthesised policy inert regardless of how correct it is. A4 is the one that A1 alone cannot cover: a known-correctly-scoped positive-control query has to return the *same* rows under RLS as without it, because a policy on the wrong column also withholds rows — just the wrong ones — and A1's row count alone cannot tell those two cases apart.",
+        "One more discipline runs underneath all four: `EnableRLS` does not trust its own `Exec` call returning `nil` as proof the policy exists. It re-reads `pg_policies` and `pg_class.relrowsecurity` from the catalog afterward and treats absence there as failure even when the DDL reported success — `ErrSynthesisNotConfirmed` exists because a nil error from a database driver is not the same claim as 'the catalog now agrees.'"
+      ],
+      "tradeoff": "The probe database is disposable — a `TEMPLATE` copy of the target's own database, created and dropped, never written back to. That guarantee is only as good as the copy step itself; nothing in the four self-checks can catch the probe having silently diverged from the schema it was supposed to mirror before the checks ran against it."
+    },
+    {
+      "id": "validation",
+      "title": "Two targets, and what each one actually proves",
+      "paragraphs": [
+        "v1.0.0 was run against two real, unfamiliar, third-party PostgreSQL applications, not fixtures — and each result is stated at the strength it actually holds rather than generalised past its own denominator. Against `coder/coder`, a 132-relation production schema exercised through its own real `dbpurge` test suite via the capture proxy, the mechanism produced 37 real `LEAK`-shaped verdicts on real traffic, with 18 of 762 row-level-touching queries coming back `UNATTRIBUTABLE` (≈2.36%) on the most recent full run — the number the shipped unattributable-rate ceiling is calibrated against.",
+        "`zitadel/zitadel` was chosen deliberately for what `coder` could not exercise: composite `instance_id`/`org_id` tenancy, non-public schemas, real `pgx`/`pgxpool` statement naming. It found and fixed two real defects — missing non-public-schema grants, and a discarded restricted-role error — and produced 3 `LEAK`-shaped verdicts, all the same bootstrap query that resolves which tenant a request belongs to from its hostname, plausibly a category error for that query's own architectural role rather than a confirmed finding.",
+        "None of the `LEAK` verdicts from either target has been disclosed as a security finding, and the README says explicitly why: every one requires a code-path review the tool cannot itself perform — it observes SQL, not the application logic that produced it — to rule out a compensating control before a report to a maintainer would be responsible instead of an overclaim."
+      ],
+      "tradeoff": "The `zitadel` unattributable rate — 204 of 1,187 queries, ≈17.19% — is stated as a property of that one capture's composition (a one-time bootstrap/migration sequence, not steady-state traffic), not as a general attribution-quality number for `zitadel`. Reporting a rate without its denominator and without saying what traffic it was measured against is how tools like this end up overclaiming, and the README is written to make that impossible to do by accident."
+    },
+    {
+      "id": "limits",
+      "title": "Two confirmed blind spots, named rather than hidden",
+      "paragraphs": [
+        "`docs/LIMITATIONS.md` documents blind spots the differential corpus actually demonstrates against real PostgreSQL, not ones predicted by reading the code. L5 is the correct-predicate-wrong-tenant case Tier 2 exists to fix — confirmed for both `coder` and `zitadel` by directly searching each codebase for `set_config`/`SET LOCAL` tenant-context calls and finding none, so it is a confirmed gap for these two targets specifically, not a theoretical one carried over from the design doc.",
+        "L7 is structural in a different way: a view created without `security_invoker` has its RLS evaluated using the view owner's privileges by Postgres itself, and in essentially any real target that owner is the same privileged role the tool's own unrestricted baseline already connects as — so a leak through such a view is invisible on both legs of the diff simultaneously. There is no view-owner configuration that makes this both leaky and catchable at once, which is why the doc records it as unfixed rather than proposing a workaround that doesn't actually close the gap."
+      ],
+      "tradeoff": "A tool that states its own blind spots this precisely is more trustworthy than one that doesn't, and also more work to keep honest — the moment `verify`'s self-checks or the differ's logic change, L5 and L7's status has to be re-verified against the fixture corpus again, not just re-asserted in prose."
+    }
+  ]
+}

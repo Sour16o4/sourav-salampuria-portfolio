@@ -11,13 +11,15 @@ import { Stops } from '@/lib/stops';
 import { Todo, isTodo } from '@/lib/todo';
 
 /**
- * Shared renderer for /platform and /book-api.
+ * Shared renderer for the project case-study pages (/platform, /tenantguard,
+ * /skillsight).
  *
  * Chapter content comes from a JSON data file, never from JSX. No parallax on
  * a reading surface — the only motion here is the progress bar.
  */
 export default function ChapterArticle({ doc }) {
   const sourceHref = doc.sourceKey ? site.links[doc.sourceKey] : null;
+  const liveHref = doc.liveKey ? site.links[doc.liveKey] : null;
 
   return (
     <>
@@ -65,16 +67,28 @@ export default function ChapterArticle({ doc }) {
               </dl>
             ) : null}
 
-            {sourceHref ? (
-              <p className="mt-8">
-                <a
-                  className="mono text-[13px] text-acc"
-                  href={sourceHref}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  {doc.sourceLabel}
-                </a>
+            {sourceHref || liveHref ? (
+              <p className="mt-8 flex flex-wrap gap-x-6 gap-y-2">
+                {sourceHref ? (
+                  <a
+                    className="mono text-[13px] text-acc"
+                    href={sourceHref}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    {doc.sourceLabel}
+                  </a>
+                ) : null}
+                {liveHref ? (
+                  <a
+                    className="mono text-[13px] text-acc"
+                    href={liveHref}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    {doc.liveLabel}
+                  </a>
+                ) : null}
               </p>
             ) : null}
           </header>

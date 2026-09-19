@@ -1,0 +1,56 @@
+{
+  "title": "Skillsight",
+  "kicker": "Personal project · 2026",
+  "summary": "A curated link aggregator for frontend, design and Claude Code resources: one searchable shelf, an in-app preview viewer that knows when a site refuses to be framed, real captured thumbnails instead of favicons, and an admin dashboard to curate it without touching code.",
+
+  "sourceKey": "skillsightSource",
+  "sourceLabel": "Source on GitHub →",
+  "liveKey": "skillsightLive",
+  "liveLabel": "Live site →",
+
+  "metrics": [
+    { "id": "stack", "value": "Next.js 16", "unit": "", "label": "App Router · Turbopack" },
+    { "id": "storage", "value": "Postgres", "unit": "", "label": "Drizzle ORM · Neon" },
+    { "id": "auth", "value": "5", "unit": "attempts", "label": "before lockout" }
+  ],
+
+  "chapters": [
+    {
+      "id": "problem",
+      "title": "The shelf, not the bookmark bar",
+      "paragraphs": [
+        "The problem this solves is small and specific: I kept re-searching for the same twenty or thirty design tools, docs sites and component libraries because a browser bookmarks bar does not scale past a dozen entries and does not search. Skillsight is a curated shelf instead — hand-picked resources organised by category and tag, with fuzzy search bound to `/` so finding one is a keypress, not a folder crawl.",
+        "The part that makes it worth building rather than a spreadsheet is the in-app viewer. Clicking a card opens the destination inside Skillsight in an embedded frame when the target allows it, so looking something up does not mean losing the tab you were on. Most sites do not allow it — `X-Frame-Options` and CSP `frame-ancestors` exist for exactly this — and the honest failure mode there is a blank iframe that looks broken. Skillsight checks first and shows a clean 'visit directly' fallback instead of shipping that broken state."
+      ],
+      "tradeoff": "A curated shelf only stays useful if it stays curated. There is no crowdsourcing and no auto-discovery — every entry is added by hand through the admin dashboard, which means the list is only as current as the time I spend maintaining it."
+    },
+    {
+      "id": "embed-check",
+      "title": "Deciding whether a site can be framed, correctly",
+      "paragraphs": [
+        "The naive version of 'can this be embedded' is a HEAD request that checks for the presence of `X-Frame-Options`. That gets the precedence wrong: CSP's `frame-ancestors` directive supersedes `X-Frame-Options` when both are present, per spec, so checking `X-Frame-Options` first and stopping there approves sites the browser will still refuse to render.",
+        "`checkFrameHeaders` in `src/lib/embed-check.js` is a pure function — status code plus raw header values in, an embeddable verdict out, no network I/O — which is what makes it fully unit-testable rather than something I have to trust by inspection. It parses every `frame-ancestors` source list present, and every one of them has to allow Skillsight's own origin: `'none'` and `'self'` both deny (self denies because the request is cross-origin), `*` allows outright, and a named origin is compared against Skillsight's own via URL parsing rather than string equality, so `https://example.com` and `https://example.com:443` are not treated as different sources by accident.",
+        "Only when no `frame-ancestors` directive is present at all does it fall back to `X-Frame-Options`, checking for `deny` or `sameorigin` substrings case-insensitively. The redirect-following is manual too — Node's `http`/`https` modules directly, capped at five hops with a six-second timeout — specifically so the final hop's headers are the ones evaluated, not an intermediate redirect's, since a redirect chain can legitimately change frame policy partway through."
+      ],
+      "tradeoff": "The six-second timeout is inside the route's own `maxDuration`, which bounds how long a single unresponsive third-party site can hold up an embed check — but it also means a genuinely slow site that would ultimately allow embedding gets reported as unembeddable. I chose a hard ceiling that protects the request over one that waits for every site's own latency."
+    },
+    {
+      "id": "auth",
+      "title": "Two lockouts, same shape",
+      "paragraphs": [
+        "The admin dashboard is authenticated with Better Auth, which ships its own two-factor lockout mechanics. The email/password step needed the same protection and Better Auth does not cover that step, so `src/lib/login-lockout.js` implements it deliberately mirroring the built-in one rather than inventing a different shape: five consecutive failures locks the identifier for fifteen minutes, tracked per-identifier in its own table with a lazy-expiry read — a lock past its `lockedUntil` timestamp is cleared on the next read that touches it rather than by a background job.",
+        "Every admin mutation — adding a site, editing one, removing one — writes an audit log row: who, what action, which site, the before and after state, and the IP. `writeAuditLog` is a single insert with no branching, which is the point: there is no code path in the admin flow that can perform a write without also recording one, because the audit call sits next to the mutation itself rather than behind a flag."
+      ],
+      "tradeoff": "Mirroring Better Auth's lockout by hand instead of finding a way to route the password step through Better Auth's own mechanism means two lockout implementations exist in the codebase, tracking two separate tables, and they can in principle drift out of sync if one is changed without the other."
+    }
+  ],
+
+  "differently": {
+    "title": "What I'd do differently",
+    "items": [
+      "Move the embed check off the request path. It runs synchronously when a card is opened, which means the six-second worst case is paid live by whoever clicks first. Caching the verdict per domain and refreshing it on a schedule would make every subsequent click instant.",
+      "Unify the two lockout tables. Better Auth's two-factor lockout and the hand-rolled password lockout track the same shape of state in two places for no reason beyond Better Auth not covering the first step — a shared table keyed by mechanism would remove the drift risk outright.",
+      "Generate thumbnails on a queue instead of a script run by hand. `generate-thumbnails.mjs` has to be re-run manually after adding a site, which is the one curation step that is not actually inside the admin dashboard yet."
+    ]
+  }
+}

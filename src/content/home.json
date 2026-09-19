@@ -60,7 +60,7 @@
           "  help           this list",
           "  skills         print skills.txt",
           "  ls             list the project reports",
-          "  open <name>    open a report — platform, book-api, about",
+          "  open <name>    open a report — platform, tenantguard, skillsight, about",
           "  whoami         one line",
           "  contact        how to reach me",
           "  clear          wipe the screen"
@@ -70,9 +70,10 @@
           "I break my own infrastructure on purpose and publish what the tests do not cover."
         ],
         "ls": [
-          "platform/    GitOps & Observability Platform — self-reconciling KIND cluster",
-          "book-api/    Book Inventory REST API — deliberately small Go service",
-          "about/       longer bio"
+          "platform/     GitOps & Observability Platform — self-reconciling KIND cluster",
+          "tenantguard/  multi-tenant isolation verifier — Postgres RLS as the oracle",
+          "skillsight/   curated link aggregator — in-app preview, admin dashboard",
+          "about/        longer bio"
         ],
         "contact": [
           "email    {email}",
@@ -83,7 +84,8 @@
       },
       "routes": {
         "platform": "/platform",
-        "book-api": "/book-api",
+        "tenantguard": "/tenantguard",
+        "skillsight": "/skillsight",
         "about": "/about"
       },
       "opening": "opening {path} …"

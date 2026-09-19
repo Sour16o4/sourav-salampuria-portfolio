@@ -17,7 +17,9 @@
     "linkedin": "https://www.linkedin.com/in/sourav-salampuria",
     "resume": "/resume.pdf",
     "platformSource": "https://github.com/Sour16o4/gitops-observability-platform",
-    "bookApiSource": "https://github.com/Sour16o4/book-inventory-api"
+    "skillsightSource": "https://github.com/Sour16o4/Skillsight",
+    "skillsightLive": "https://skillsight-mocha.vercel.app",
+    "tenantguardSource": "https://github.com/Sour16o4/tenantguard"
   },
 
   "nav": [

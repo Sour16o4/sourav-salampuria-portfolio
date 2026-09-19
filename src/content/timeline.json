@@ -30,30 +30,32 @@
       "href": "/platform"
     },
     {
-      "id": "book-api",
-      "when": "2025",
+      "id": "tenantguard",
+      "when": "2026",
       "org": "Open source",
-      "title": "Book Inventory REST API",
+      "title": "tenantguard",
       "chips": [
         "Go",
-        "REST",
-        "Postgres"
+        "PostgreSQL",
+        "RLS",
+        "Security"
       ],
-      "description": "A small Go REST API over a single resource: five endpoints, Gin for routing, GORM over Postgres, and configuration read from the environment. Deliberately minimal — the smallest thing that is still a real service.",
-      "href": "/book-api"
+      "description": "A multi-tenant isolation verifier that synthesises row-level-security policies and diffs captured traffic under them — proving a leak against real PostgreSQL semantics instead of guessing from SQL text. Validated against two real third-party applications, coder and zitadel.",
+      "href": "/tenantguard"
     },
     {
-      "id": "internship-studio",
-      "when": "2024",
-      "org": "Internship Studio",
-      "title": "DevOps Engineer Intern",
+      "id": "skillsight",
+      "when": "2026",
+      "org": "Personal project",
+      "title": "Skillsight",
       "chips": [
-        "Docker",
-        "CI/CD",
-        "Linux"
+        "Next.js",
+        "PostgreSQL",
+        "Drizzle",
+        "Auth"
       ],
-      "description": "Two months on containerised and web-based application deployment: Docker-based backend services, Go REST APIs, and Kubernetes deployments practised end to end rather than shipped to production.",
-      "href": null
+      "description": "A curated link aggregator for frontend, design and Claude Code resources: fuzzy search, an in-app viewer that detects when a site refuses to be framed, captured thumbnails, and an admin dashboard with audit logging. Live on Vercel.",
+      "href": "/skillsight"
     },
     {
       "id": "srm",
