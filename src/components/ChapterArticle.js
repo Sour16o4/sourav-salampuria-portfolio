@@ -1,7 +1,10 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
+import DotMatrix from '@/components/DotMatrix';
 import FlowDiagram from '@/components/FlowDiagram';
+import FunnelChart from '@/components/FunnelChart';
 import ReadingProgress from '@/components/ReadingProgress';
 import Topology from '@/components/Topology';
 import Reveal from '@/components/Reveal';
@@ -50,7 +53,7 @@ export default function ChapterArticle({ doc }) {
             {doc.metrics?.length ? (
               <dl className="mt-12 grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-px overflow-hidden rounded-[7px] border border-faint bg-faint">
                 {doc.metrics.map((metric) => (
-                  <div key={metric.id} className="flex flex-col bg-bg-2 p-5">
+                  <div key={metric.id} className="card-surface flex flex-col p-5">
                     <dd className="order-1 m-0 flex items-baseline gap-1">
                       <span className="mono text-[22px] leading-none font-medium tracking-[-0.02em]">
                         {metric.value}
@@ -62,6 +65,11 @@ export default function ChapterArticle({ doc }) {
                     <dt className="order-2 mt-3 text-[12px] leading-snug text-mute">
                       {metric.label}
                     </dt>
+                    {metric.visual === 'dots' ? (
+                      <Reveal as="div" className="order-3">
+                        <DotMatrix value={Number(metric.value)} />
+                      </Reveal>
+                    ) : null}
                   </div>
                 ))}
               </dl>
@@ -92,6 +100,38 @@ export default function ChapterArticle({ doc }) {
               </p>
             ) : null}
           </header>
+
+          {doc.gallery?.length ? (
+            <Reveal
+              as="div"
+              stagger
+              className="container-x mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2"
+            >
+              {doc.gallery.map((shot) => {
+                const isPhone = shot.size === 'phone';
+                return (
+                  <figure
+                    key={shot.src}
+                    className={`card overflow-hidden p-0 ${shot.span === 'full' ? 'sm:col-span-2' : ''}`}
+                  >
+                    <Image
+                      src={shot.src}
+                      alt={shot.alt}
+                      width={shot.width}
+                      height={shot.height}
+                      className={isPhone ? 'mx-auto h-auto w-full max-w-[240px]' : 'h-auto w-full'}
+                      sizes={isPhone ? '240px' : '(min-width: 640px) 50vw, 100vw'}
+                    />
+                    {shot.caption ? (
+                      <figcaption className="mono border-t border-faint px-4 py-3 text-[12px] text-mute">
+                        {shot.caption}
+                      </figcaption>
+                    ) : null}
+                  </figure>
+                );
+              })}
+            </Reveal>
+          ) : null}
 
           <div className="container-x">
             {doc.chapters.map((chapter, index) => (
@@ -134,6 +174,8 @@ export default function ChapterArticle({ doc }) {
                   </div>
                 ) : null}
 
+                {chapter.funnel?.length ? <FunnelChart tiers={chapter.funnel} /> : null}
+
                 {/* An aside, not a container. A full card gave every chapter a
                     second boxed block competing with the diagrams above it; a
                     rule in the accent marks it as a turn in the argument and
@@ -156,7 +198,7 @@ export default function ChapterArticle({ doc }) {
             ))}
 
             {doc.differently ? (
-              <section className="hairline mt-24 max-w-[70ch] pt-12">
+              <section className="mt-24 max-w-[70ch] pt-12">
                 <h2 className="t-h3 text-[clamp(22px,2.6vw,30px)]">
                   <Stops text={doc.differently.title} />
                 </h2>

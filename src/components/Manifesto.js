@@ -68,7 +68,7 @@ export default function Manifesto({ manifesto }) {
   }, []);
 
   return (
-    <section ref={sectionRef} className="hairline section-y" aria-labelledby="manifesto-heading">
+    <section ref={sectionRef} className="section-y" aria-labelledby="manifesto-heading">
       <div className="container-x">
         {/* Parallax owns this wrapper's transform; Reveal owns the transforms
             of the elements inside it. Never the same node twice. */}

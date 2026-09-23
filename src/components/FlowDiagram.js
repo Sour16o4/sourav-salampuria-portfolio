@@ -15,7 +15,7 @@
 
 function Card({ step, index }) {
   return (
-    <div className="rounded-[7px] border border-faint bg-bg-2 px-4 py-3">
+    <div className="card-surface rounded-[7px] border border-faint px-4 py-3">
       <p className="mono flex items-baseline gap-2 text-[13px] leading-snug">
         <span aria-hidden="true" className="text-acc">
           {String(index + 1).padStart(2, '0')}

@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 
-import ThemeToggle from '@/components/ThemeToggle';
 import site from '@/content/site.json';
 
 /**
@@ -69,8 +68,6 @@ export default function SiteNav() {
               </li>
             ))}
           </ul>
-
-          <ThemeToggle />
 
           <button
             type="button"

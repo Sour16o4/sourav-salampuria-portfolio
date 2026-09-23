@@ -11,18 +11,40 @@
 }
 
 @theme {
-  /* Dark, near-black, one green accent. No second chroma anywhere. */
-  --color-bg: #0a0a0a;
+  /* Dark, near-black, one accent. No second chroma anywhere.
+     EXPERIMENTAL: matched to the liquid-hero caustics ground (#020405)
+     rather than the original #0a0a0a, so the fixed background (see
+     LiquidBackground) blends seamlessly into the page everywhere its own
+     gradients fade to transparent, instead of a visible seam.
+
+     The accent itself is pulled directly from that same background — the
+     caustics' own mid-tone cyan (#7ee0ff), not a colour invented separately
+     from it. Green read as a second, competing hue sitting on top of a
+     blue-cyan scene rather than part of it: green and cyan are
+     psychologically distinct registers (green reads as growth/organic/go,
+     cyan reads as cool/technical/depth), so every green border, dot and
+     link looked like a UI layer floating over the artwork instead of
+     belonging to the same world. Reusing the background's own colour for
+     every accent — borders, focus states, the terminal prompt, chip
+     highlights — makes the foreground read as made of the same light as
+     the backdrop, not decorated on top of it. */
+  --color-bg: #020405;
   --color-bg-2: #111112;
   --color-bg-3: #161618;
   --color-ink: #ecece8;
-  --color-mute: #8b8983;
+  /* Body copy, descriptions, meta lines — every non-heading sentence on the
+     site runs through this one token. It was tuned dark enough to read as
+     "quiet" against a plain flat background, but against the animated
+     smoke it read as genuinely dim rather than just deferential — brightened
+     well clear of --ink so the hierarchy (headings still stand out) holds,
+     but body text stops being a strain to read. */
+  --color-mute: #b7b5ae;
   --color-faint: rgba(236, 236, 232, 0.1);
-  --color-acc: #5be49b;
-  --color-acc-dim: rgba(91, 228, 155, 0.14);
+  --color-acc: #7ee0ff;
+  --color-acc-dim: rgba(126, 224, 255, 0.16);
   /* Text that sits ON the accent. Flips with the theme so the primary button
      keeps its contrast in both. */
-  --color-acc-fg: #06130d;
+  --color-acc-fg: #04212e;
   /* The terminal panel is its own surface — a fourth step in the same family,
      distinct from the page ground and from cards, never a different material. */
   --color-terminal: #0f0f11;
@@ -41,19 +63,7 @@
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1440px;
 
-  --animate-orbit: orbit-spin 28s linear infinite;
-  --animate-orbit-back: orbit-spin-back 28s linear infinite;
   --animate-caret: caret 1.05s step-end infinite;
-
-  @keyframes orbit-spin {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-  }
-
-  @keyframes orbit-spin-back {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(-360deg); }
-  }
 
   @keyframes caret {
     0%,
@@ -71,61 +81,15 @@
    Every Tailwind utility compiles to `var(--color-*)`, so swapping those eight
    variables re-themes the entire site — no `dark:` variants anywhere.
 
-   Dark is the default. Light applies when the visitor's OS asks for it, or
-   when the toggle stamps [data-theme] on <html>. The attribute always wins.
-
-   The site has no browser storage (spec), so the toggle holds for the session
-   and client-side navigation, and resets to the OS preference on hard reload.
-   --------------------------------------------------------------------------- */
+   EXPERIMENTAL: the light/dark toggle and the light "Dusty Teal" theme are
+   removed for now, while the liquid-hero redesign is in progress — a
+   dark-only hero next to a page that could still flip to a light theme
+   made the site look broken rather than mid-redesign. Dark is the only
+   resolved state until the rest of the site's direction is settled. */
 :root {
   --container: 1120px;
   --pad-x: clamp(20px, 5vw, 52px);
   color-scheme: dark;
-}
-
-/* Rose white — four surfaces from one family, each a distinct step, none the
-   same. Ground is the mid tone, cards lift above it, the terminal sits just
-   below it, and chips sit lowest.
-
-       cards     #fdfaf9   lightest
-       ground    #f8f2f0
-       terminal  #f2e9e6
-       chips     #ede2df   deepest
-
-   Ink carries a red bias to match, rather than a neutral charcoal dropped on
-   pink. Measured on the ground: ink 15.6:1, mute 5.4:1, accent 5.9:1; on the
-   terminal surface: ink 14.4:1, accent 5.5:1.
-
-   Duplicated across both selectors so OS preference and the toggle can never
-   drift apart. */
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme='dark']) {
-    color-scheme: light;
-    --color-bg: #f8f2f0;
-    --color-bg-2: #fdfaf9;
-    --color-bg-3: #ede2df;
-    --color-terminal: #f2e9e6;
-    --color-ink: #1e1a19;
-    --color-mute: #6b615e;
-    --color-faint: rgba(30, 26, 25, 0.14);
-    --color-acc: #0b6b44;
-    --color-acc-dim: rgba(11, 107, 68, 0.14);
-    --color-acc-fg: #fdfaf9;
-  }
-}
-
-:root[data-theme='light'] {
-  color-scheme: light;
-  --color-bg: #f8f2f0;
-  --color-bg-2: #fdfaf9;
-  --color-bg-3: #ede2df;
-  --color-terminal: #f2e9e6;
-  --color-ink: #1e1a19;
-  --color-mute: #6b615e;
-  --color-faint: rgba(30, 26, 25, 0.14);
-  --color-acc: #0b6b44;
-  --color-acc-dim: rgba(11, 107, 68, 0.14);
-  --color-acc-fg: #fdfaf9;
 }
 
 :root {
@@ -224,10 +188,19 @@
     }
   }
 
+  /* A quiet ring, not a coloured box — keyboard focus still needs to be
+     visible, but a solid green `outline` with its own fixed border-radius
+     was what actually made it look like a stray rectangle rather than
+     part of the design: `outline` doesn't reliably follow an element's
+     own corner radius, so a 999px pill button or a plain nav link both
+     got the same small, mismatched rounded-rectangle frame drawn around
+     them. `box-shadow` does inherit the element's real border-radius, so
+     switching to it — with a muted, two-tone glow instead of solid green —
+     fixes the shape and the colour at once. No `border-radius` set here on
+     purpose; each element keeps its own. */
   :focus-visible {
-    outline: 2px solid var(--acc);
-    outline-offset: 3px;
-    border-radius: 2px;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(2, 4, 5, 0.85), 0 0 0 4px rgba(245, 247, 248, 0.45);
   }
 
   ::selection {
@@ -248,10 +221,6 @@
 
   .section-y {
     padding-block: clamp(72px, 11vw, 132px);
-  }
-
-  .hairline {
-    border-top: 1px solid var(--faint);
   }
 
   /* --------------------------------------------------------- typography -- */
@@ -305,10 +274,42 @@
   }
 
   /* ------------------------------------------------------------ surfaces -- */
+  /* Glass, not a flat fill: the surface colour stays the same token as
+     before, mixed down to partial opacity so it reads correctly in both
+     themes without a separate override, plus a blur so whatever sits behind
+     it — another card, a scrolled section — shows through softened rather
+     than vanishing under an opaque panel. Falls back to the old solid fill
+     automatically wherever `backdrop-filter` isn't supported, since the
+     opaque `background` below is still declared first. */
   .card {
     background: var(--bg-2);
+    background: color-mix(in srgb, var(--bg-2) 64%, transparent);
     border: 1px solid var(--faint);
     border-radius: var(--radius-card);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+  }
+
+  /* Nested surfaces — a diagram node inside a flow, a region inside a
+     topology, a metric cell inside its grid — were still the OLD flat
+     `--bg-2`/`--bg-3` fill, so every one of them sat as an opaque island
+     inside an otherwise-glass `.card`, blocking the same softened
+     background the card around it already shows through. Same recipe as
+     `.card` — partial-opacity colour-mix plus blur — just scoped to two
+     tokens so a nested diagram can still alternate depth (Topology) the
+     way it already did with flat fills. */
+  .card-surface {
+    background: var(--bg-2);
+    background: color-mix(in srgb, var(--bg-2) 55%, transparent);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+  }
+
+  .card-surface-alt {
+    background: var(--bg-3);
+    background: color-mix(in srgb, var(--bg-3) 55%, transparent);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
   }
 
   .chip {
@@ -326,43 +327,85 @@
     white-space: nowrap;
   }
 
+  /* Pill-shaped, with real depth — not a flat fill. Two variants: a solid
+     light "primary" and a translucent dark "glass" secondary, both built
+     with an inset highlight along the top edge plus a soft ambient shadow
+     lifting the whole shape off the page, so a button this rounded reads
+     as an object to press rather than a link to read. This is the one
+     button form for the whole site — the hero's actions, the contact
+     form's submit, anywhere else a real call-to-action appears — not a
+     hero-only treatment. */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    min-height: 44px;
-    padding: 0 18px;
-    border-radius: var(--radius-chip);
-    border: 1px solid var(--faint);
-    background: transparent;
-    color: var(--ink);
+    min-height: 48px;
+    padding: 0 26px;
+    border-radius: 999px;
+    border: 1px solid transparent;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    transition: border-color 0.18s cubic-bezier(0.33, 1, 0.68, 1),
+    text-decoration: none;
+    transition: transform 0.18s cubic-bezier(0.33, 1, 0.68, 1),
+      box-shadow 0.18s cubic-bezier(0.33, 1, 0.68, 1),
       background-color 0.18s cubic-bezier(0.33, 1, 0.68, 1),
-      color 0.18s cubic-bezier(0.33, 1, 0.68, 1);
+      border-color 0.18s cubic-bezier(0.33, 1, 0.68, 1);
   }
 
   .btn-primary {
-    background: var(--acc);
-    border-color: var(--acc);
-    color: var(--acc-fg);
-    font-weight: 600;
+    background: linear-gradient(180deg, #ffffff 0%, #e7ecef 100%);
+    color: #06171d;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -1px 1px rgba(6, 23, 29, 0.08),
+      0 1px 2px rgba(2, 4, 5, 0.3),
+      0 8px 20px rgba(2, 4, 5, 0.35);
+  }
+
+  /* Glassmorphic: translucent fill plus backdrop blur, so whatever the
+     button sits over — this site's animated smoke, a card, another
+     surface — shows through softened rather than being hidden under an
+     opaque chip. Skeuomorphic: the inset highlight/shadow pair on top of
+     that blur is what turns "translucent" into "glass with real depth,"
+     rather than just a dimmed rectangle. */
+  .btn-glass {
+    color: #f5f7f8;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border-color: rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+      0 8px 20px rgba(2, 4, 5, 0.35);
   }
 
   @media (hover: hover) and (pointer: fine) {
     .btn:hover {
-      border-color: var(--acc);
-      color: var(--acc);
+      transform: translateY(-1px);
     }
 
     .btn-primary:hover {
-      background: #6df0a8;
-      border-color: #6df0a8;
-      color: var(--acc-fg);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 1px rgba(6, 23, 29, 0.08),
+        0 2px 4px rgba(2, 4, 5, 0.3),
+        0 12px 26px rgba(2, 4, 5, 0.4);
     }
+
+    .btn-glass:hover {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.08) 100%);
+      border-color: rgba(255, 255, 255, 0.32);
+    }
+  }
+
+  .btn:active {
+    transform: translateY(0);
+    box-shadow:
+      inset 0 1px 2px rgba(2, 4, 5, 0.25),
+      0 1px 2px rgba(2, 4, 5, 0.2);
   }
 
   .link-quiet {
@@ -377,9 +420,16 @@
   }
 
   /* -------------------------------------------------------------- input -- */
+  /* Same glass recipe as `.card` — this was still the old opaque `--bg-2`
+     fill, so the form sat as a flat black box on a page where every other
+     surface (cards, diagram nodes, the terminal) already shows the
+     background's blur through it. */
   .field {
     width: 100%;
     background: var(--bg-2);
+    background: color-mix(in srgb, var(--bg-2) 55%, transparent);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
     border: 1px solid var(--faint);
     border-radius: var(--radius-chip);
     padding: 12px 14px;
@@ -399,11 +449,15 @@
   /* ----------------------------------------------------------- terminal -- */
   /* The terminal follows the theme like every other surface. It gets its own
      token so it reads as a distinct panel rather than a repeat of the card,
-     but it is the same material as the rest of the page. */
+     but it is the same glass material as the rest of the page — same
+     partial-opacity-plus-blur treatment as `.card`, just its own tint. */
   .terminal {
     background: var(--terminal);
+    background: color-mix(in srgb, var(--terminal) 66%, transparent);
     border: 1px solid var(--faint);
     border-radius: var(--radius-card);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
     overflow: hidden;
   }
 
@@ -425,78 +479,88 @@
     animation: var(--animate-caret);
   }
 
-  /* -------------------------------------------------------------- orbit -- */
-  /* The stack ring. Two animations at one duration: the ring turns forward,
-     each logo turns back by the same amount, so the circle rotates while the
-     marks stay upright. Sized in vw so it shrinks with the viewport instead of
-     overflowing it — the radius is inset by half a dot so nothing crosses the
-     container edge. */
-  .orbit {
-    --orbit-size: clamp(236px, 78vw, 440px);
-    --orbit-dot: clamp(34px, 10vw, 44px);
-    --orbit-r: calc(var(--orbit-size) / 2 - var(--orbit-dot) / 2 - 4px);
+  /* ------------------------------------------------------- stack marquee -- */
+  /* The stack, auto-scrolling. The list is rendered twice, back to back in
+     one flex row; the row's own `translateX(0) -> translateX(-50%)`
+     animation is what scrolls it, and because the second half is a pixel-
+     identical repeat of the first, that loop point is invisible — `-50%` is
+     relative to the row's own doubled width, so it holds at any viewport
+     with nothing measured in JS. No JS at all, in fact. */
+  .stack-marquee {
     position: relative;
-    width: var(--orbit-size);
-    height: var(--orbit-size);
-    /* The ring is a square that spins, so its axis-aligned box swells to the
-       diagonal at 45deg and pushed the page 48px wide at 1024. Its corners are
-       empty — every mark is inscribed within the square — so clipping to the
-       square hides nothing and stops the sweep from counting as layout. */
-    overflow: clip;
+    padding-block: 4px;
+    overflow: hidden;
   }
 
-  .orbit::before {
+  .stack-marquee::before,
+  .stack-marquee::after {
     content: '';
     position: absolute;
-    inset: calc(var(--orbit-dot) / 2);
-    border: 1px solid var(--faint);
-    border-radius: 50%;
+    top: 0;
+    bottom: 0;
+    width: clamp(24px, 6vw, 64px);
+    z-index: 2;
+    pointer-events: none;
+  }
+  .stack-marquee::before {
+    left: 0;
+    background: linear-gradient(90deg, var(--bg), transparent);
+  }
+  .stack-marquee::after {
+    right: 0;
+    background: linear-gradient(270deg, var(--bg), transparent);
   }
 
-  .orbit-ring {
-    position: absolute;
-    inset: 0;
-    animation: var(--animate-orbit);
+  .stack-marquee-track {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: max-content;
+    /* Vertical headroom so a hovered icon has room to scale up without its
+       edge colliding with a neighbour or getting clipped — the bug where a
+       bigger icon visibly broke the row's alignment. */
+    padding-block: 12px;
   }
 
-  .orbit-item {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: var(--orbit-dot);
-    height: var(--orbit-dot);
-    margin: calc(var(--orbit-dot) / -2);
-    transform: rotate(calc(var(--i) * (360deg / var(--n))))
-      translateY(calc(var(--orbit-r) * -1))
-      rotate(calc(var(--i) * (-360deg / var(--n))));
+  @media (prefers-reduced-motion: no-preference) {
+    .stack-marquee-track {
+      animation: stack-scroll 26s linear infinite;
+    }
   }
 
-  .orbit-icon {
+  .stack-marquee-icon {
     display: grid;
     place-items: center;
-    width: 100%;
-    height: 100%;
+    position: relative;
+    flex: none;
+    width: clamp(46px, 9vw, 56px);
+    height: clamp(46px, 9vw, 56px);
     border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
     border-radius: var(--radius-chip);
     background: var(--bg-2);
-    color: var(--brand);
-    animation: var(--animate-orbit-back);
-    transition: transform 0.18s ease;
+    color: var(--brand, var(--acc));
+    transition: transform 0.18s ease, border-color 0.18s ease;
   }
 
-  .orbit-icon svg {
+  .stack-marquee-icon svg {
     width: 20px;
     height: 20px;
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .orbit:hover .orbit-ring,
-    .orbit:hover .orbit-icon {
-      animation-play-state: paused;
-    }
-
-    .orbit-icon:hover {
+    .stack-marquee-icon:hover {
       transform: scale(1.12);
+      border-color: color-mix(in srgb, var(--acc) 38%, transparent);
+      /* Lifted above its neighbours so the scaled-up box draws cleanly over
+         their borders instead of interleaving with them. */
+      z-index: 1;
+    }
+  }
+
+  @keyframes stack-scroll {
+    to {
+      transform: translateX(-50%);
     }
   }
 
@@ -523,6 +587,54 @@
     background: var(--acc);
     border-color: var(--acc);
     box-shadow: 0 0 0 5px var(--acc-dim);
+  }
+
+  /* Work card hover layers — see WorkCard.js. Three stacked overlays, all
+     Framer-Motion-driven, all decorative (aria-hidden), all below the real
+     content in stacking order. */
+  .work-card {
+    isolation: isolate;
+  }
+  .work-card-glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .work-card-sheen {
+    position: absolute;
+    inset: -20% -40%;
+    pointer-events: none;
+    z-index: 0;
+    background: linear-gradient(75deg, transparent 40%, rgba(255, 255, 255, 0.1) 50%, transparent 60%);
+  }
+  .work-card-edge {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    pointer-events: none;
+    z-index: 0;
+    background: linear-gradient(90deg, transparent, var(--acc), transparent);
+    box-shadow: 0 0 12px var(--acc);
+  }
+
+  /* The work-card entrance's own accent — replaces the old shared spine
+     rail. GSAP-driven (scaleX 0 → 1, left-anchored), one per card, drawn
+     in sync with that card's own pop-in rather than a single line
+     threading the whole list. */
+  .work-card-top-accent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    border-radius: 999px 0 0 999px;
+    background: linear-gradient(90deg, var(--acc), rgba(126, 224, 255, 0.15));
+    box-shadow: 0 0 10px var(--acc);
+    transform-origin: left center;
+    z-index: 2;
   }
 
   /* ----------------------------------------------------------- skeleton -- */
@@ -585,9 +697,255 @@
   will-change: transform, opacity;
 }
 
+/* ============================================================================
+   LIQUID HERO — experimental redesign preview. `lh-` prefixed throughout so
+   nothing here can collide with the rest of the site's class names. Not
+   wired into any theme token — deliberately dark-only, independent of the
+   site's light/dark toggle (which no longer exists — see the theme removal
+   note further up this file).
+
+   The background (.lh-bg and everything under it, from LiquidBackground) is
+   fixed to the true viewport and stays visible behind the whole site, every
+   page, not scoped to .lh-stage — it's mounted in the root layout, outside
+   .lh-stage's own DOM subtree entirely, siblings rather than parent/child. */
+.lh-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: #020405;
+  pointer-events: none;
+  /* This element's size is fully fixed by `inset: 0`, never by its content,
+     and nothing about it should ever depend on or affect the rest of the
+     scrolling document below it. `contain: strict` tells the browser that
+     up front, so a scroll (or anything else happening in the page's normal
+     flow) can never trigger layout/paint work on this element — it's an
+     isolated subtree the compositor can treat as its own island. Paired
+     with `will-change: transform`, a strong hint to give it its own GPU
+     compositing layer rather than leaving that to the browser's own
+     heuristics, given how expensive its filtered children are to redraw. */
+  contain: strict;
+  will-change: transform;
+}
+
+/* A `position: fixed` element at z-index 0 still creates its own stacking
+   context, and any positioned/z-indexed element paints above every plain,
+   non-positioned sibling in normal document flow, regardless of DOM order.
+   Most of this site's text is plain static content with no position of its
+   own, so .lh-bg was painting straight over it — correct in the DOM (right
+   opacity, right color, right rect), invisible on screen. Pushing .lh-bg to
+   a negative z-index instead of fixing this from here turned out to hide
+   the background itself in this environment (a separate, worse bug), so
+   the fix is on this side: lift the page's actual content into its own
+   positioned stacking context, so it paints above the background the
+   normal way rather than changing the background's own stacking at all. */
+.lh-page-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* 130%-in-each-axis was never enough margin: it makes a RECTANGLE (130% of
+   width, 130% of height — not the same pixel size unless the viewport is
+   already square), and a rotating rectangle's straight edges sweep inward
+   as it turns. The guaranteed-covered zone of a rotating shape is its
+   inscribed circle, radius = min(width, height) / 2 — so a non-square
+   rectangle's edge crosses back into the viewport at some angle no matter
+   how generous the percentage looks, which is exactly the hard diagonal
+   line that showed up. Sizing both dimensions off `vmax` (the LARGER of
+   viewport width/height) instead makes this a true square in real pixels,
+   at any aspect ratio, with an inscribed-circle radius comfortably bigger
+   than the viewport's own farthest corner — so no edge is ever reachable. */
+/* The box needs to READ as 180vmax on screen (that's what the coverage math
+   above and the filters' own baseFrequency/displacement values are tuned
+   for), but it doesn't need to be FILTERED at that size — at 180vmax a 4K
+   monitor is asking the SVG turbulence filters to run over ~48 million
+   pixels, per layer, continuously, which is real, measurable lag, not a
+   rounding error. Filtering happens at this element's own intrinsic size —
+   60vmax here, 1/9th the pixel count — and `scale(3)` then blows the
+   already-filtered result up to the full 180vmax footprint as a plain GPU
+   texture stretch, which is compositor-cheap regardless of how expensive
+   the filter itself was. Every descendant (the three rotating layers) is
+   sized and centered relative to THIS box, so they inherit the scale-up
+   automatically without their own CSS changing at all. */
+.lh-caustic-group {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60vmax;
+  height: 60vmax;
+  transform: translate(-50%, -50%) scale(3);
+}
+
+/* Plain divs, painted by an inline `background: radial-gradient(...)` (see
+   LiquidBackground) — CSS gradient percentages are always relative to the
+   element's own real box, at any size or aspect ratio, which is the whole
+   reason this isn't an SVG viewBox doing the positioning. This element
+   carries the filter and NOTHING that ever animates — see .lh-rot below
+   for why that split matters. `contain` reinforces the same point to the
+   browser: this subtree's rendering is fully self-determined, so its
+   painted output can be cached and reused rather than re-verified. */
+.lh-caustic-layer {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: screen;
+  contain: layout paint style;
+}
+
+/* The rotation wrapper — deliberately a SEPARATE element from
+   .lh-caustic-layer, not just a class on it. A reference filter
+   (feTurbulence etc.) is expensive and is generally computed on the
+   paint/raster thread as a bitmap, not the GPU compositor; that bitmap
+   can only be cached and reused across frames if the element it's on
+   never itself has an animated property. Put the filter and the
+   animated transform on the same element, and the browser has no static
+   output to fall back to — it can end up re-running the entire
+   turbulence chain on every frame the transform changes, i.e. 60
+   times a second, no matter how small the filtered area is. This
+   element owns ONLY the transform animation; its child owns ONLY the
+   filter. That split is what actually lets the compositor animate
+   rotation for free once the filtered bitmap is painted the first time. */
+.lh-rot {
+  position: absolute;
+  inset: 0;
+  transform-box: border-box;
+  transform-origin: 50% 50%;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+.lh-rot-a {
+  animation-name: lhSpinCW;
+  animation-duration: 200s;
+}
+.lh-rot-b {
+  animation-name: lhSpinCCW;
+  animation-duration: 140s;
+}
+.lh-rot-c {
+  animation-name: lhSpinCW;
+  animation-duration: 260s;
+}
+@keyframes lhSpinCW {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes lhSpinCCW {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.lh-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(ellipse at 50% 55%, transparent 35%, rgba(2, 4, 5, 0.85) 100%);
+  pointer-events: none;
+}
+
+/* Fixes visible colour-banding "stripes" on the caustic gradients — a
+   smooth radial gradient across a full screen exceeds an 8-bit display's
+   real colour steps, so the eye sees the steps as rings. A faint dither
+   breaks that up; it's a correctness fix, not a texture choice. */
+.lh-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0.05;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.lh-stage {
+  position: relative;
+  /* min-, not a fixed height: with the terminal restored, content can be
+     taller than one screen on narrow viewports, and forcing it to a fixed
+     100svh would have clipped or squeezed it. */
+  min-height: 100svh;
+  padding-block: clamp(96px, 12vh, 140px);
+  color: #f5f7f8;
+}
+
+.lh-content {
+  position: relative;
+  z-index: 3;
+  max-width: 1180px;
+  margin-inline: auto;
+  padding-inline: clamp(20px, 5vw, 48px);
+}
+
+/* Text column + terminal column, same responsive shape as the original
+   Hero's own grid (stacked below `lg`, side by side above it) — restoring
+   the terminal shouldn't mean re-inventing how it's laid out. */
+.lh-content-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  /* start, not center — the text column (name/bio/buttons) is much shorter
+     than the terminal panel now that the name is smaller, and centering two
+     very different-height columns against each other reads as them not
+     actually lining up with one another. Sharing a top edge instead is what
+     makes them read as one deliberate layout. */
+  align-items: start;
+  gap: 48px;
+}
+@media (min-width: 1024px) {
+  .lh-content-split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 64px;
+  }
+}
+
+.lh-text-col {
+  min-width: 0;
+}
+
+.lh-terminal-col {
+  min-width: 0;
+}
+
+.lh-location {
+  margin: 14px 0 0;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a9b4b8;
+}
+
+.lh-name {
+  font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  /* Noticeably smaller than the earlier clamp(52px, 9.5vw, 122px) — that
+     scale was forcing an awkward mid-word wrap ("Salampu / ria") on
+     ordinary screens instead of just reading as a bold, confident name. */
+  font-size: clamp(34px, 5.5vw, 68px);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: #f5f7f8;
+  text-wrap: balance;
+  cursor: default;
+}
+
+.lh-role {
+  margin: 22px 0 0;
+  font-size: clamp(16px, 2.1vw, 21px);
+  font-weight: 400;
+  color: #a9b4b8;
+  max-width: 36ch;
+}
+
+.lh-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 42px;
+  flex-wrap: wrap;
+}
+
 /* ---------------------------------------------------------------------------
    Reduced motion: entrances resolve instantly, parallax to zero, typewriter
-   prints in full, counters show final values, the orbit stops.
+   prints in full, counters show final values.
    --------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -616,23 +974,18 @@
     transform: none !important;
   }
 
-  .orbit-ring,
-  .orbit-icon {
+  .terminal-caret {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .stack-marquee-track {
     animation: none !important;
     transform: none !important;
   }
 
-  /* The ring is laid out by transform, so killing it outright would stack every
-     logo in the centre. Re-apply the placement without the rotation. */
-  .orbit-item {
-    transform: rotate(calc(var(--i) * (360deg / var(--n))))
-      translateY(calc(var(--orbit-r) * -1))
-      rotate(calc(var(--i) * (-360deg / var(--n)))) !important;
-  }
-
-  .terminal-caret {
+  .lh-rot {
     animation: none !important;
-    opacity: 1 !important;
   }
 
   .skeleton::after {

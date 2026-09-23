@@ -1,6 +1,6 @@
 {
   "title": "tenantguard",
-  "kicker": "Open source · 2026",
+  "kicker": "Personal project · 2026",
   "summary": "A multi-tenant isolation verifier for Go applications backed by PostgreSQL. It gives the database a synthesised row-level-security policy, replays captured traffic under it, and diffs the row sets — so a leak is a proven fact about what Postgres would have withheld, never a heuristic about what the SQL text looks like.",
 
   "sourceKey": "tenantguardSource",
@@ -8,7 +8,7 @@
 
   "metrics": [
     { "id": "tiers", "value": "3", "unit": "", "label": "triage · differential · guardrail" },
-    { "id": "leaks", "value": "37", "unit": "", "label": "LEAK-shaped verdicts on coder" },
+    { "id": "leaks", "value": "37", "unit": "", "label": "LEAK-shaped verdicts on coder", "visual": "dots" },
     { "id": "targets", "value": "2", "unit": "", "label": "real third-party validation targets" }
   ],
 
@@ -29,6 +29,23 @@
         "Tier 0, `triage`, needs nothing but a Go repository — no database, no traffic. It scans for SQL against likely tenant-scoped tables and flags statements with no mention of the tenant column anywhere in their text. It never exits non-zero and it never claims to have found a leak, only a ranked list of suspicions worth pointing Tier 1 at.",
         "Tier 1, `differential`, is where a real verdict happens. It needs a declared tenancy policy (`infer`'s output, reviewed by a human — the tool never trusts its own inference automatically), and real traffic seeded by at least two tenants in the same scoped table. That second tenant is not a nicety: a single-tenant seed makes the restricted and unrestricted row sets identical by construction, which would make every query report `SAFE` regardless of whether the isolation is real.",
         "Tier 2, `guardrail`, is the one class Tier 1 structurally cannot catch: a query whose predicate is syntactically correct but bound to the wrong tenant value. Nothing at Tier 1 has independent ground truth for which tenant a query *should* have targeted beyond the value already sitting in its own text. Tier 2 requires actual application changes — tenant-context propagation, a driver wrapper — and exists today as a demonstrated mechanism in `internal/guardrail`, not a turnkey CLI feature."
+      ],
+      "funnel": [
+        {
+          "id": "triage",
+          "name": "triage",
+          "description": "Static scan, no database or traffic — a ranked list of suspicions, never a verdict."
+        },
+        {
+          "id": "differential",
+          "name": "differential",
+          "description": "A real verdict — replays traffic from two seeded tenants under a declared policy."
+        },
+        {
+          "id": "guardrail",
+          "name": "guardrail",
+          "description": "The one class Tier 1 structurally cannot catch — a query bound to the wrong tenant."
+        }
       ],
       "tradeoff": "Naming three tiers up front is also naming what is not built yet. Tier 2 is real code, exercised in tests, but it is not something you point at your own app and get results from the way `verify` and `audit` already are — the README says this plainly rather than letting the CLI's existence imply otherwise."
     },

@@ -1,7 +1,7 @@
 {
   "title": "Skillsight",
-  "kicker": "Personal project · 2026",
-  "summary": "A curated link aggregator for frontend, design and Claude Code resources: one searchable shelf, an in-app preview viewer that knows when a site refuses to be framed, real captured thumbnails instead of favicons, and an admin dashboard to curate it without touching code.",
+  "kicker": "Deployed · live on Vercel · 2026",
+  "summary": "A curated link aggregator for frontend, design and Claude Code resources: one searchable shelf, an in-app preview viewer that knows when a site refuses to be framed, real captured thumbnails instead of favicons, and an admin dashboard to curate it without touching code. Publicly deployed — the screenshots below are the running site, not mockups.",
 
   "sourceKey": "skillsightSource",
   "sourceLabel": "Source on GitHub →",
@@ -14,6 +14,39 @@
     { "id": "auth", "value": "5", "unit": "attempts", "label": "before lockout" }
   ],
 
+  "gallery": [
+    {
+      "src": "/skillsight/homepage-dark.webp",
+      "alt": "Skillsight homepage in dark mode, showing the curated shelf of site cards with category filters",
+      "caption": "Homepage · dark mode",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "src": "/skillsight/homepage-light.webp",
+      "alt": "Skillsight homepage in light mode, showing the same curated shelf of site cards",
+      "caption": "Homepage · light mode",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "src": "/skillsight/homepage-mobile.webp",
+      "alt": "Skillsight homepage on a mobile viewport in dark mode, cards stacked in a single column",
+      "caption": "Mobile, 390px · dark mode",
+      "width": 390,
+      "height": 844,
+      "size": "phone"
+    },
+    {
+      "src": "/skillsight/homepage-mobile-light.webp",
+      "alt": "Skillsight homepage on a mobile viewport in light mode, cards stacked in a single column",
+      "caption": "Mobile, 390px · light mode",
+      "width": 390,
+      "height": 844,
+      "size": "phone"
+    }
+  ],
+
   "chapters": [
     {
       "id": "problem",
@@ -23,6 +56,16 @@
         "The part that makes it worth building rather than a spreadsheet is the in-app viewer. Clicking a card opens the destination inside Skillsight in an embedded frame when the target allows it, so looking something up does not mean losing the tab you were on. Most sites do not allow it — `X-Frame-Options` and CSP `frame-ancestors` exist for exactly this — and the honest failure mode there is a blank iframe that looks broken. Skillsight checks first and shows a clean 'visit directly' fallback instead of shipping that broken state."
       ],
       "tradeoff": "A curated shelf only stays useful if it stays curated. There is no crowdsourcing and no auto-discovery — every entry is added by hand through the admin dashboard, which means the list is only as current as the time I spend maintaining it."
+    },
+    {
+      "id": "motion",
+      "title": "Motion that marks a state change, not decoration",
+      "paragraphs": [
+        "Every animated element on the shelf exists because a state actually changed underneath it, not because a static screen looked unfinished. The theme toggle is the clearest case: one round button whose glyph morphs between a sun and a moon on click, driven by Framer Motion's `AnimatePresence` with a 250ms rotate-and-scale cross-fade, rather than a labelled switch. The harder part is invisible in the animation itself — the real theme is only known once the component has mounted client-side, so it renders a neutral placeholder icon on the server and swaps to the true one on mount. Skipping that and rendering the resolved icon immediately would hydrate as a structural mismatch, a `<path>` where the server sent a `<circle>`, which React cannot patch up quietly.",
+        "The card grid uses the same discipline. New cards entering the shelf stagger in — opacity and a 12px rise, 40ms apart — but only `firstPaint`, the very first render of that filtered set. Re-filtering by category does not replay the stagger; Framer Motion's `layout` prop alone handles cards repositioning, because replaying an entrance animation every time a filter changes is the fastest way to make search feel like it's fighting the interface instead of responding to it.",
+        "The in-app viewer is a third case with its own honest edge: when `checkFrameHeaders` reports a site cannot be embedded, there is no animated attempt at a broken iframe to paper over — the 'visit directly' fallback renders immediately. Motion here marks a transition that actually happened; it does not simulate one to hide a state the app can't deliver."
+      ],
+      "tradeoff": "All of this motion is Framer Motion, none of it is GSAP or CSS keyframes — a single animation library for a client-heavy dashboard app, versus this portfolio's own choice of GSAP + ScrollTrigger for scroll-linked reveals. Different tools for different jobs, but it means the two codebases share no motion vocabulary, which is a real cost the next time either one changes hands."
     },
     {
       "id": "embed-check",

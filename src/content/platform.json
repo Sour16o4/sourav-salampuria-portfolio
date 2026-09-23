@@ -1,6 +1,6 @@
 {
   "title": "GitOps & Observability Platform",
-  "kicker": "Open source · 2026",
+  "kicker": "Personal project · 2026",
   "summary": "A multi-node KIND cluster that reconciles itself from git: Go microservice with Prometheus RED metrics in a minimal non-root image, parameterised Helm chart with ServiceMonitor and an optional HPA, GitHub Actions gating on kubeconform, Helm lint and GHCR publishing, Argo CD with self-healing, and Grafana fed by kube-prometheus-stack plus Loki/Promtail.",
   "sourceKey": "platformSource",
   "sourceLabel": "Source on GitHub →",

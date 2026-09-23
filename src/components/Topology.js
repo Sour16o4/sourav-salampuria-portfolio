@@ -12,7 +12,7 @@
  * page, so the layers separate without a second colour or a shadow.
  */
 
-const SURFACE = ['bg-bg-2', 'bg-bg-3', 'bg-bg-2', 'bg-bg-3'];
+const SURFACE = ['card-surface', 'card-surface-alt', 'card-surface', 'card-surface-alt'];
 
 function Region({ region, depth }) {
   const children = region.children ?? [];

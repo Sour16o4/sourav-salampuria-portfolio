@@ -1,15 +1,16 @@
 {
   "label": "005 / about",
   "title": "About.",
-  "lead": "Backend and platform engineer in Gurgaon, India. Currently on a client platform team through Quess Corp, and looking for backend and DevOps roles.",
+  "lead": "A software developer in Gurgaon, India, building backend services and the platforms they run on. Currently an Executive on a client deputation through Quess Corp Limited, and looking for software developer, backend, and DevOps roles.",
   "paragraphs": [
-    "I write Go, and I build the path that gets it to a cluster and keeps it there. Most of what I find interesting sits at the seam between those two things — a service is not finished when the handler returns the right JSON, it is finished when there is a repeatable way for it to reach production and an honest signal when it stops behaving.",
-    "The thing I keep coming back to is that infrastructure runs on claims nobody checks. A controller advertises self-healing. A chart declares a liveness probe. A pipeline says it blocks on vulnerabilities. In most repositories those are sentences, not results, because verifying them costs an afternoon and no reviewer is going to ask. The gap between a configured guarantee and a tested one is where outages live.",
+    "I write Go services and the infrastructure that runs them, and lately the Next.js interfaces some of that work needs on the other side. Most of what I find interesting sits at the seam between those two: a service is not finished when it returns the right response, and a page is not finished when it renders — both are finished when there is a repeatable way for them to reach production and an honest signal when they stop behaving.",
+    "The thing I keep coming back to is that infrastructure and applications both run on claims nobody checks. A controller advertises self-healing. A chart declares a liveness probe. A tool claims it can detect a data leak. In most repositories those are sentences, not results, because verifying them costs an afternoon and no reviewer is going to ask. The gap between a configured guarantee and a tested one is where outages, and false confidence, live.",
     "So the case studies here are written the other way round. Each one states a decision, what it cost, and the cases it does not cover. Where I could not verify something against the repository, it is not on the page — which is why there is less here than there could be.",
-    "Currently on a platform team through Quess Corp, supporting deployment and monitoring for an enterprise client, and looking for backend and DevOps roles. Outside that: I read source when documentation disagrees with behaviour, which happens more than it should."
+    "Outside that client work: I read source when documentation disagrees with behaviour, which happens more than it should."
   ],
   "focus": [
     "Go",
+    "Next.js",
     "Kubernetes",
     "Docker",
     "Helm",

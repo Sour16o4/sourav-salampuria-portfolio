@@ -1,60 +1,58 @@
 import icons from '@/lib/stack-icons.json';
+import SkillsChart from '@/components/SkillsChart';
 
 /**
- * The stack, as a rotating orbit.
+ * The stack, auto-scrolling.
  *
- * Two columns on a laptop — the statement on the left, the ring on the right —
- * matching the manifesto and contact sections. A ring centred alone in a
- * 1400px column left a band of dead space either side of it and read as a gap
- * rather than a section; paired with copy it fills the measure like everything
- * else on the page. Below `lg` it stacks, copy first.
+ * No JS at all — server-rendered like the rest of the page. The icon list
+ * is rendered twice, back to back in one flex row, and the row scrolls
+ * itself via a single CSS `translateX(0) -> translateX(-50%)` animation:
+ * since the second half is a pixel-identical repeat of the first, the loop
+ * point is invisible and the scroll reads as continuous rather than as a
+ * jump. `-50%` is relative to the row's own (doubled) width, so this holds
+ * at any viewport without measuring anything.
  *
- * Server-rendered with no client JS. The rotation is two CSS animations at one
- * duration, the ring forward and each mark backward, so the ring turns while
- * the logos stay upright. It therefore runs with JS disabled and stops on its
- * own under `prefers-reduced-motion`.
- *
- * Marks carry their real brand colour, which is the one place on the site with
- * a palette other than ink-and-accent. The chroma check in the verify suite
- * carves out `.orbit-icon` explicitly for that reason and covers everything
- * else unchanged.
+ * SkillsChart below it is the only client-side piece here — a bar chart of
+ * real tool counts per terminal group, not a second decorative marquee.
  */
-export default function Orbit({ orbit }) {
-  const count = icons.length;
+export default function Orbit({ orbit, stack }) {
+  const doubled = [...icons, ...icons];
 
   return (
-    <section className="hairline border-b border-faint section-y" aria-labelledby="stack-heading">
-      <div className="container-x grid items-center gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] lg:gap-16">
-        <div>
-          <p id="stack-heading" className="micro">
-            <span className="text-acc">/</span> stack
-          </p>
-          <h2 className="t-h3 mt-5 max-w-[16ch] text-[clamp(22px,2.6vw,30px)]">
-            {orbit.heading}
-            <span className="text-acc">.</span>
-          </h2>
-          <p className="t-body mt-6 max-w-[46ch]">{orbit.lead}</p>
-        </div>
+    <section className="section-y" aria-labelledby="stack-heading">
+      <div className="container-x">
+        <p id="stack-heading" className="micro">
+          <span className="text-acc">/</span> stack
+        </p>
+        <h2 className="t-h3 mt-5 max-w-[30ch] text-[clamp(22px,2.6vw,30px)]">
+          {orbit.heading}
+          <span className="text-acc">.</span>
+        </h2>
+        <p className="t-body mt-6 max-w-[52ch]">{orbit.lead}</p>
 
-        <div className="flex justify-center lg:justify-end">
-          <div className="orbit" style={{ '--n': count }}>
-            <div className="orbit-ring" aria-hidden="true">
-              {icons.map((icon, index) => (
-                <span key={icon.label} className="orbit-item" style={{ '--i': index }}>
-                  <span className="orbit-icon" title={icon.label} style={{ '--brand': icon.hex }}>
-                    <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                      <path d={icon.path} fill="currentColor" />
-                    </svg>
-                  </span>
-                </span>
-              ))}
-            </div>
+        <div className="stack-marquee mt-12">
+          <div className="stack-marquee-track">
+            {doubled.map((icon, index) => (
+              <span
+                key={`${icon.label}-${index}`}
+                aria-hidden={index >= icons.length}
+                className="stack-marquee-icon"
+                title={icon.label}
+                style={{ '--brand': icon.mono ? 'var(--ink)' : icon.hex }}
+              >
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                  <path d={icon.path} fill="currentColor" />
+                </svg>
+              </span>
+            ))}
           </div>
         </div>
+
+        {stack?.length ? <SkillsChart groups={stack} /> : null}
       </div>
 
-      {/* The ring is decoration; this is the content. Announced once, in order,
-          with no mention of a circle. */}
+      {/* The row is decoration; this is the content. Announced once, in
+          order, with no mention of scrolling. */}
       <ul className="sr-only">
         {icons.map((icon) => (
           <li key={icon.label}>{icon.label}</li>

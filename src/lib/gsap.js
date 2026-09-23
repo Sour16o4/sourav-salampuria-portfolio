@@ -40,6 +40,31 @@ export function loadScrollTrigger() {
         const gsap = gsapModule.gsap ?? gsapModule.default;
         const ScrollTrigger = stModule.ScrollTrigger ?? stModule.default;
         gsap.registerPlugin(ScrollTrigger);
+
+        // Every ScrollTrigger created after this line is positioned against
+        // whatever the page's layout happens to be at that exact moment —
+        // and since this whole module loads deliberately late (see
+        // whenIdle above), that moment can land before web fonts, or other
+        // content still settling further down the page, have finished
+        // shifting the real page height. A trigger's start/end points get
+        // calculated once, against a too-short page, and a heading whose
+        // "start" was placed past the actual (now longer) page can end up
+        // never crossing it — the reveal simply never fires, and that
+        // content is stuck invisible even though it's really on screen.
+        // Re-running the calculation once fonts are actually ready, and
+        // again once the full page (images included) has loaded, re-measures
+        // every trigger against final layout — a cheap recalculation, not
+        // an animation, and safe to call more than once.
+        const refresh = () => ScrollTrigger.refresh();
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(refresh);
+        }
+        if (document.readyState === 'complete') {
+          refresh();
+        } else {
+          window.addEventListener('load', refresh, { once: true });
+        }
+
         return { gsap, ScrollTrigger };
       })
       .catch((error) => {

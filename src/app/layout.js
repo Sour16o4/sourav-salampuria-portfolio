@@ -1,5 +1,6 @@
 import { Inter } from 'next/font/google';
 
+import LiquidBackground from '@/components/LiquidBackground';
 import PageTransition from '@/components/PageTransition';
 import SiteFooter from '@/components/SiteFooter';
 import SiteNav from '@/components/SiteNav';
@@ -55,28 +56,32 @@ export const viewport = {
  */
 const MOTION_GATE = `try{if(window.matchMedia&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('js-motion')}}catch(e){}`;
 
-/**
- * Restores a previously chosen theme before the first paint.
- *
- * Without this the page would render at the OS preference and then flip once
- * React hydrated — the flash is the whole reason this runs blocking, ahead of
- * everything below it. No cookie means no explicit choice, so the attribute is
- * left off and the `prefers-color-scheme` media query decides.
- */
-const THEME_GATE = `try{var m=document.cookie.match(/(?:^|;\\s*)theme=(light|dark)(?:;|$)/);if(m){document.documentElement.setAttribute('data-theme',m[1])}}catch(e){}`;
+// This gate mutates <html> directly, ahead of React's own hydration — that's
+// the entire point, it's what kills the flash. React has no way to know that
+// mismatch is intentional, so <html> below needs suppressHydrationWarning or
+// every load logs a false-positive hydration error for a className diff that
+// was never a bug.
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body>
-        <script dangerouslySetInnerHTML={{ __html: THEME_GATE }} />
         <script dangerouslySetInnerHTML={{ __html: MOTION_GATE }} />
+        {/* EXPERIMENTAL: first in the body, so it paints behind everything
+            after it in normal stacking order — no z-index tricks needed. */}
+        <LiquidBackground />
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <SiteNav />
-        <PageTransition>{children}</PageTransition>
-        <SiteFooter />
+        {/* Everything real lives in here, lifted into its own stacking
+            context (see .lh-page-content in globals.css) so it paints
+            above the fixed background regardless of whether any given
+            piece of content happens to be positioned itself. */}
+        <div className="lh-page-content">
+          <SiteNav />
+          <PageTransition>{children}</PageTransition>
+          <SiteFooter />
+        </div>
       </body>
     </html>
   );

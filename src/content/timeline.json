@@ -2,37 +2,36 @@
   "entries": [
     {
       "id": "quess",
-      "when": "Current",
-      "org": "Quess Corp (client deputation)",
-      "title": "Executive, platform team",
+      "when": "Oct 2025 – Present",
+      "org": "Quess Corp Limited (client deputation)",
+      "title": "Executive – Client Project",
       "chips": [
         "Kubernetes",
         "CI/CD",
         "Linux",
         "Ops"
       ],
-      "description": "Supporting client-side technology operations on a platform team through Quess Corp — application monitoring, deployment activities and the documentation that goes with them, working alongside the technical teams that own the delivery process.",
+      "description": "Supporting client-side technology operations for an enterprise client — application monitoring, deployment activities and the documentation that goes with them — while collaborating with the technical teams that own production workflows and enterprise delivery processes.",
       "href": null
     },
     {
-      "id": "platform",
+      "id": "skillsight",
       "when": "2026",
-      "org": "Open source",
-      "title": "GitOps & Observability Platform",
+      "org": "Deployed · live on Vercel",
+      "title": "Skillsight",
       "chips": [
-        "KIND",
-        "Argo CD",
-        "Helm",
-        "Prometheus",
-        "Loki"
+        "Next.js",
+        "PostgreSQL",
+        "Drizzle",
+        "Auth"
       ],
-      "description": "A multi-node KIND cluster that reconciles itself from git: Go microservice with Prometheus RED metrics in a minimal non-root image, parameterised Helm chart with ServiceMonitor and an optional HPA, GitHub Actions gating on kubeconform, Helm lint and GHCR publishing, Argo CD with self-healing, and Grafana fed by kube-prometheus-stack plus Loki/Promtail.",
-      "href": "/platform"
+      "description": "A curated link aggregator for frontend, design and Claude Code resources: fuzzy search, an in-app viewer that detects when a site refuses to be framed, captured thumbnails, and an admin dashboard with audit logging. Live on Vercel.",
+      "href": "/skillsight"
     },
     {
       "id": "tenantguard",
       "when": "2026",
-      "org": "Open source",
+      "org": "Personal project",
       "title": "tenantguard",
       "chips": [
         "Go",
@@ -44,18 +43,19 @@
       "href": "/tenantguard"
     },
     {
-      "id": "skillsight",
+      "id": "platform",
       "when": "2026",
       "org": "Personal project",
-      "title": "Skillsight",
+      "title": "GitOps & Observability Platform",
       "chips": [
-        "Next.js",
-        "PostgreSQL",
-        "Drizzle",
-        "Auth"
+        "KIND",
+        "Argo CD",
+        "Helm",
+        "Prometheus",
+        "Loki"
       ],
-      "description": "A curated link aggregator for frontend, design and Claude Code resources: fuzzy search, an in-app viewer that detects when a site refuses to be framed, captured thumbnails, and an admin dashboard with audit logging. Live on Vercel.",
-      "href": "/skillsight"
+      "description": "A multi-node KIND cluster that reconciles itself from git: Go microservice with Prometheus RED metrics in a minimal non-root image, parameterised Helm chart with ServiceMonitor and an optional HPA, GitHub Actions gating on kubeconform, Helm lint and GHCR publishing, Argo CD with self-healing, and Grafana fed by kube-prometheus-stack plus Loki/Promtail.",
+      "href": "/platform"
     },
     {
       "id": "srm",

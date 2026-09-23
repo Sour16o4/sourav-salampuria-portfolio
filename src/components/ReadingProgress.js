@@ -6,7 +6,7 @@ import { prefersReducedMotion } from '@/lib/motion';
 import { loadScrollTrigger } from '@/lib/gsap';
 
 /**
- * A thin green bar scrubbed to article height. Scroll-linked, so GSAP.
+ * A thin accent-coloured bar scrubbed to article height. Scroll-linked, so GSAP.
  * Hidden entirely under reduced motion — an empty rail that never fills is
  * worse than no rail.
  */

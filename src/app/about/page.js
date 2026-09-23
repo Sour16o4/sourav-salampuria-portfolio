@@ -41,7 +41,7 @@ export default function AboutPage() {
           ))}
         </Reveal>
 
-        <div className="hairline mt-14 pt-10">
+        <div className="mt-14 pt-10">
           <p className="micro">Works with</p>
           <ul className="m-0 mt-5 flex list-none flex-wrap gap-2 p-0">
             {about.focus.map((item) => (
@@ -52,7 +52,7 @@ export default function AboutPage() {
           </ul>
         </div>
 
-        <div className="hairline mt-12 pt-10">
+        <div className="mt-12 pt-10">
           <p className="micro">Elsewhere</p>
           <ul className="m-0 mt-5 flex list-none flex-col gap-x-8 gap-y-2 p-0 sm:flex-row sm:flex-wrap">
             <li>

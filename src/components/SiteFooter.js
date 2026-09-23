@@ -7,7 +7,7 @@ export default function SiteFooter() {
   const year = 2026;
 
   return (
-    <footer className="hairline">
+    <footer>
       <div
         className="container-x flex flex-col gap-6 py-10 sm:flex-row sm:items-center sm:justify-between"
         style={{ paddingBottom: 'max(40px, env(safe-area-inset-bottom))' }}

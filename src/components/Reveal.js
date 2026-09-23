@@ -21,6 +21,7 @@ export default function Reveal({
   children,
   className,
   stagger = false,
+  staggerAmount = MOTION.stagger,
   start = 'top 86%',
   ...rest
 }) {
@@ -40,6 +41,7 @@ export default function Reveal({
 
     let cancelled = false;
     let context = null;
+    let fallback = null;
 
     loadScrollTrigger().then((lib) => {
       if (cancelled || !lib) {
@@ -57,7 +59,7 @@ export default function Reveal({
             opacity: 1,
             duration: MOTION.enterDuration,
             ease: MOTION.enterEase,
-            stagger: stagger ? MOTION.stagger : 0,
+            stagger: stagger ? staggerAmount : 0,
             scrollTrigger: { trigger: root, start, once: true },
             onComplete: () => {
               for (const target of targets) target.style.willChange = 'auto';
@@ -65,14 +67,38 @@ export default function Reveal({
           }
         );
       }, root);
+
+      // Safety net. ScrollTrigger's start position is calculated the
+      // instant this runs, which — because this module loads deliberately
+      // late (see loadScrollTrigger) — can land after fonts or other
+      // content have shifted the page's real layout. A trigger calculated
+      // against stale layout can miss its mark entirely, leaving content
+      // that is genuinely on screen permanently stuck at opacity 0. That
+      // failure mode is worse than the reveal simply not playing, so
+      // anything still hidden a couple of seconds after its trigger was
+      // set up, despite already being visible in the viewport, gets
+      // forced into its finished state instead of staying invisible.
+      fallback = window.setTimeout(() => {
+        const stillHidden = targets.some((target) => parseFloat(getComputedStyle(target).opacity) < 1);
+        if (!stillHidden) return;
+        const onScreen = targets.some((target) => {
+          const rect = target.getBoundingClientRect();
+          return rect.bottom > 0 && rect.top < window.innerHeight;
+        });
+        if (onScreen) {
+          if (context) context.revert();
+          settle(targets);
+        }
+      }, 2500);
     });
 
     return () => {
       cancelled = true;
+      if (fallback) window.clearTimeout(fallback);
       if (context) context.revert();
       settle(targets);
     };
-  }, [stagger, start]);
+  }, [stagger, staggerAmount, start]);
 
   const attrs = stagger ? { 'data-reveal-stagger': '' } : { 'data-reveal': '' };
 

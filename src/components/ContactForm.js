@@ -82,7 +82,7 @@ export default function ContactForm({ contact }) {
   const error = state !== 'idle' && !sending && !sent ? state : null;
 
   return (
-    <section id="contact" className="hairline section-y" aria-labelledby="contact-heading">
+    <section id="contact" className="section-y" aria-labelledby="contact-heading">
       <div className="container-x grid gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] lg:gap-20">
         <Reveal as="div" stagger>
           <p className="micro">{contact.label}</p>
