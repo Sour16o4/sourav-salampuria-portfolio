@@ -95,10 +95,17 @@ export default function WorkCard({ entry, reduce, isActive, isDimmed, onHoverSta
 
         {entry.href ? (
           <p className="mt-5">
-            <Link href={entry.href} className="mono inline-flex items-center gap-1.5 text-[12px] text-acc">
-              Detailed report
-              <ArrowRight size={14} strokeWidth={1.5} aria-hidden="true" />
-            </Link>
+            {entry.href.startsWith('http') ? (
+              <a href={entry.href} target="_blank" rel="noopener noreferrer" className="mono inline-flex items-center gap-1.5 text-[12px] text-acc">
+                Live site
+                <ArrowRight size={14} strokeWidth={1.5} aria-hidden="true" />
+              </a>
+            ) : (
+              <Link href={entry.href} className="mono inline-flex items-center gap-1.5 text-[12px] text-acc">
+                Detailed report
+                <ArrowRight size={14} strokeWidth={1.5} aria-hidden="true" />
+              </Link>
+            )}
           </p>
         ) : null}
       </div>

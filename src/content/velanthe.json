@@ -1,0 +1,89 @@
+{
+  "title": "Velanthe",
+  "kicker": "Deployed · live on Vercel · 2026",
+  "summary": "A portfolio e-commerce store for Velanthe, an invented luxury skincare brand: browse the catalog, filter by skin type and price, search, keep a bag and wishlist, sign in with Supabase (or stay a guest), place a mock order and see it in order history. Publicly deployed — the screenshots below are the running site, not mockups.",
+
+  "sourceKey": "velantheSource",
+  "sourceLabel": "Source on GitHub →",
+  "liveKey": "velantheLive",
+  "liveLabel": "Live site →",
+
+  "metrics": [
+    { "id": "stack", "value": "Next.js 15", "unit": "", "label": "App Router · React 19" },
+    { "id": "backend", "value": "Supabase", "unit": "", "label": "Auth · Postgres · RLS" },
+    { "id": "tests", "value": "node --test", "unit": "", "label": "no test framework" }
+  ],
+
+  "gallery": [
+    {
+      "src": "/velanthe/home.webp",
+      "alt": "Velanthe home page hero",
+      "caption": "Home",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "src": "/velanthe/collection.webp",
+      "alt": "Velanthe collection page with skin-type and price filters",
+      "caption": "Collection & filters",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "src": "/velanthe/product.webp",
+      "alt": "Velanthe product page with size chooser",
+      "caption": "Product page",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "src": "/velanthe/bag.webp",
+      "alt": "Velanthe bag drawer with two items",
+      "caption": "Bag drawer",
+      "width": 1440,
+      "height": 900
+    }
+  ],
+
+  "chapters": [
+    {
+      "id": "scope",
+      "title": "A whole store, not a landing page",
+      "paragraphs": [
+        "The point of Velanthe was to build the full loop an online shop needs rather than a good-looking home page: catalog, product pages with a size chooser, search, a bag drawer, a wishlist, sign-in, checkout, order history and order cancellation. The brand is invented, so the whole thing can be public without pretending to sell anything — checkout places a mock order.",
+        "The store is usable as a guest. Bag and wishlist live in the browser through Zustand, and signed-in users additionally get them saved in Supabase so they follow the account across devices."
+      ]
+    },
+    {
+      "id": "optional-backend",
+      "title": "Supabase is optional on purpose",
+      "paragraphs": [
+        "Without Supabase configured, Velanthe runs as a complete guest store — catalog, bag, wishlist and search all work. Only sign-in, checkout, order history and password reset need it. That keeps the project runnable with `npm install && npm run dev` and nothing else, which matters for a portfolio piece someone else will clone.",
+        "When it is enabled, Supabase provides accounts, the synced bag and wishlist, and orders. The schema (`supabase/schema.sql`) creates the `bag_items`, `wishlist_items` and `orders` tables together with their security rules, and orders carry a `status` of `placed` or `cancelled`."
+      ],
+      "tradeoff": "The demo account is shared by everyone who uses it, so order history on it is not private. It exists to let a visitor see the signed-in flow without registering."
+    },
+    {
+      "id": "rls",
+      "title": "Security rules, with a script to check them",
+      "paragraphs": [
+        "Users can't write orders directly or touch anyone else's rows — that is enforced by Supabase row-level security rather than by trusting the client. The repo ships `scripts/rls-check.mjs`, run with `node --env-file=.env.local scripts/rls-check.mjs`, which exercises those rules against a real project, so the guarantee is something that can be re-verified after any schema change instead of read off the SQL."
+      ]
+    },
+    {
+      "id": "three",
+      "title": "3D and scroll motion, loaded only where they pay off",
+      "paragraphs": [
+        "The home page carries three.js for the 3D bottles and the 'making of' scene, GSAP for scroll animation and Lenis for smooth scrolling. All three load only on the home page, so catalog, product, bag and checkout pages don't pay for them.",
+        "Styling is Tailwind CSS v4 plus the design's own stylesheet in `src/app/globals.css`."
+      ]
+    },
+    {
+      "id": "tests",
+      "title": "Tests without a framework",
+      "paragraphs": [
+        "Unit tests run on Node's built-in test runner (`npm test`, which is `node --test`), so there is no test framework to install. A small `scripts/register-alias.mjs` lets the runner understand the `@/` import shortcut. Logic such as the bag, orders, search, skin-type matching and formatting has its own `*.test.js` beside it."
+      ]
+    }
+  ]
+}

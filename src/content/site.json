@@ -19,6 +19,8 @@
     "platformSource": "https://github.com/Sour16o4/gitops-observability-platform",
     "skillsightSource": "https://github.com/Sour16o4/Skillsight",
     "skillsightLive": "https://skillsight-mocha.vercel.app",
+    "velantheSource": "https://github.com/Sour16o4/Velanthe",
+    "velantheLive": "https://velanthe.vercel.app",
     "tenantguardSource": "https://github.com/Sour16o4/tenantguard"
   },
 

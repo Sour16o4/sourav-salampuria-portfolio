@@ -15,6 +15,20 @@
       "href": null
     },
     {
+      "id": "velanthe",
+      "when": "2026",
+      "org": "Deployed · live on Vercel",
+      "title": "Velanthe",
+      "chips": [
+        "Next.js",
+        "Supabase",
+        "three.js",
+        "Zustand"
+      ],
+      "description": "A portfolio e-commerce store for an invented luxury skincare brand: catalog with skin-type and price filters, search, bag and wishlist synced to Supabase for signed-in users, mock checkout with order history and cancellation, and 3D product bottles. Row-level security keeps users out of each other's data. Works as a guest store without Supabase.",
+      "href": "/velanthe"
+    },
+    {
       "id": "skillsight",
       "when": "2026",
       "org": "Deployed · live on Vercel",
