@@ -306,7 +306,7 @@ if (suite('terminal')) {
   });
   note(after.text.includes('available commands'), 'shell: help works');
   note(after.text.includes('platform/'), 'shell: ls works');
-  note(after.text.includes('backend & platform engineer'), 'shell: whoami works');
+  note(after.text.includes('full stack developer'), 'shell: whoami works');
   note(after.text.includes('command not found: bogus'), 'shell: unknown command handled');
   note(
     Math.abs(after.height - printed.height) < 0.5,

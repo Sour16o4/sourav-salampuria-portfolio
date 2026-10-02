@@ -17,7 +17,7 @@ export default function AboutPage() {
   return (
     <main id="main">
       <article className="pb-24">
-        <Sheet ghost="ABOUT" label="About" tight>
+        <Sheet ghost="HELLO" label="About" tight>
         <p>
           <Link className="link-quiet mono inline-flex items-center gap-1.5 text-[12px]" href="/">
             <ArrowLeft size={14} strokeWidth={1.5} aria-hidden="true" />
@@ -26,9 +26,7 @@ export default function AboutPage() {
         </p>
 
         <Reveal stagger>
-          <p className="micro mt-10">{about.label}</p>
-
-          <h1 className="t-h2 mt-5">
+          <h1 className="t-h2 mt-10">
             <Stops text={about.title} />
           </h1>
 

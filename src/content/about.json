@@ -1,7 +1,6 @@
 {
-  "label": "005 / about",
   "title": "About.",
-  "lead": "A software developer in Gurgaon, India, building full-stack and backend systems with Go, Next.js, React and PostgreSQL — deployed, tested projects with authentication, row-level security and CI/CD on GitHub Actions and Kubernetes. Currently a Network Operations Executive at Quess Corp Limited, deputed to Indus Towers, and looking for software developer, backend, and DevOps roles.",
+  "lead": "A full stack developer in Gurgaon, India, building full-stack and backend systems with Go, Next.js, React and PostgreSQL — deployed, tested projects with authentication, row-level security and CI/CD on GitHub Actions and Kubernetes. Currently a Network Operations Executive at Quess Corp Limited, deputed to Indus Towers, and looking for full stack, backend, and DevOps roles.",
   "paragraphs": [
     "I write Go services and the infrastructure that runs them, and lately the Next.js interfaces some of that work needs on the other side. Most of what I find interesting sits at the seam between those two: a service is not finished when it returns the right response, and a page is not finished when it renders — both are finished when there is a repeatable way for them to reach production and an honest signal when they stop behaving.",
     "The thing I keep coming back to is that infrastructure and applications both run on claims nobody checks. A controller advertises self-healing. A chart declares a liveness probe. A tool claims it can detect a data leak. In most repositories those are sentences, not results, because verifying them costs an afternoon and no reviewer is going to ask. The gap between a configured guarantee and a tested one is where outages, and false confidence, live.",

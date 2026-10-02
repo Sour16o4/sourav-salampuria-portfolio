@@ -43,7 +43,7 @@ export default function HomePage() {
         <Orbit orbit={home.orbit} stack={home.terminal.groups} />
       </Sheet>
 
-      <Sheet ghost="WORK" label="Work">
+      <Sheet ghost="SHIPPED" label="Work">
         <WorkIndex heading={home.work.heading} projects={projects} other={other} />
       </Sheet>
 

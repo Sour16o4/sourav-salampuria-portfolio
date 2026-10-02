@@ -2,7 +2,7 @@
   "hero": {
     "locationLabel": "Gurgaon, India",
     "name": "Sourav Salampuria",
-    "roleLine": "Software Developer",
+    "roleLine": "Full Stack Developer",
     "bio": "I build delivery platforms and then attack them on purpose, so the guarantees they advertise are tested rather than assumed.",
     "actions": [
       {
@@ -65,7 +65,7 @@
           "  clear          wipe the screen"
         ],
         "whoami": [
-          "Sourav Salampuria — backend & platform engineer, Gurgaon.",
+          "Sourav Salampuria — full stack developer, Gurgaon.",
           "I break my own infrastructure on purpose and publish what the tests do not cover."
         ],
         "ls": [
@@ -108,7 +108,7 @@
   "contact": {
     "label": "004 / contact",
     "heading": "Say something.",
-    "lead": "Open to backend and DevOps roles. The fastest route is email, but the form works too.",
+    "lead": "Open to full stack, backend and DevOps roles. The fastest route is email, but the form works too.",
     "endpoint": "/api/contact",
     "fields": {
       "name": "Name",
