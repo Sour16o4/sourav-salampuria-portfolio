@@ -1,16 +1,19 @@
 {
   "label": "005 / about",
   "title": "About.",
-  "lead": "A software developer in Gurgaon, India, building backend services and the platforms they run on. Currently an Executive on a client deputation through Quess Corp Limited, and looking for software developer, backend, and DevOps roles.",
+  "lead": "A software developer in Gurgaon, India, building full-stack and backend systems with Go, Next.js, React and PostgreSQL — deployed, tested projects with authentication, row-level security and CI/CD on GitHub Actions and Kubernetes. Currently a Network Operations Executive at Quess Corp Limited, deputed to Indus Towers, and looking for software developer, backend, and DevOps roles.",
   "paragraphs": [
     "I write Go services and the infrastructure that runs them, and lately the Next.js interfaces some of that work needs on the other side. Most of what I find interesting sits at the seam between those two: a service is not finished when it returns the right response, and a page is not finished when it renders — both are finished when there is a repeatable way for them to reach production and an honest signal when they stop behaving.",
     "The thing I keep coming back to is that infrastructure and applications both run on claims nobody checks. A controller advertises self-healing. A chart declares a liveness probe. A tool claims it can detect a data leak. In most repositories those are sentences, not results, because verifying them costs an afternoon and no reviewer is going to ask. The gap between a configured guarantee and a tested one is where outages, and false confidence, live.",
     "So the case studies here are written the other way round. Each one states a decision, what it cost, and the cases it does not cover. Where I could not verify something against the repository, it is not on the page — which is why there is less here than there could be.",
-    "Outside that client work: I read source when documentation disagrees with behaviour, which happens more than it should."
+    "Outside that: day to day I monitor alarms for 18,000+ tower sites at Indus Towers, which is where I learned that a system is only as good as the signal it gives when it breaks. I also read source when documentation disagrees with behaviour, which happens more than it should."
   ],
   "focus": [
     "Go",
     "Next.js",
+    "React",
+    "PostgreSQL",
+    "Supabase",
     "Kubernetes",
     "Docker",
     "Helm",
@@ -18,9 +21,7 @@
     "GitHub Actions",
     "Prometheus",
     "Grafana",
-    "Loki",
-    "PostgreSQL",
-    "Linux"
+    "Loki"
   ],
   "resumeLabel": "Résumé (PDF)"
 }

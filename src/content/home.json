@@ -23,23 +23,27 @@
     "groups": [
       {
         "key": "language",
-        "value": "Go · SQL · Bash"
+        "value": "Go · JavaScript · SQL · Bash"
+      },
+      {
+        "key": "frontend",
+        "value": "Next.js · React · Tailwind CSS · Zustand · three.js · GSAP · Framer Motion · Playwright"
+      },
+      {
+        "key": "backend",
+        "value": "REST APIs · PostgreSQL · Supabase · Drizzle ORM · Better Auth"
       },
       {
         "key": "platform",
-        "value": "Kubernetes · Docker · Helm · Argo CD"
-      },
-      {
-        "key": "observe",
-        "value": "Prometheus · Grafana · Loki"
+        "value": "Docker · Kubernetes · Helm"
       },
       {
         "key": "deliver",
-        "value": "GitHub Actions · GHCR"
+        "value": "GitHub Actions · ArgoCD · Git · Vercel · Neon"
       },
       {
-        "key": "data",
-        "value": "PostgreSQL · MySQL"
+        "key": "observe",
+        "value": "Prometheus · Grafana · Loki · Promtail"
       }
     ],
     "comment": "# claims are tested here, not asserted",

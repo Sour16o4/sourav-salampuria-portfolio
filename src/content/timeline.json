@@ -3,15 +3,15 @@
     {
       "id": "quess",
       "when": "Oct 2025 – Present",
-      "org": "Quess Corp Limited (client deputation)",
-      "title": "Executive – Client Project",
+      "org": "Quess Corp Limited — deputed to Indus Towers, Gurgaon",
+      "title": "Executive – Network Operations",
       "chips": [
-        "Kubernetes",
-        "CI/CD",
-        "Linux",
-        "Ops"
+        "Alarm monitoring",
+        "Incident escalation",
+        "Excel",
+        "18,000+ sites"
       ],
-      "description": "Supporting client-side technology operations for an enterprise client — application monitoring, deployment activities and the documentation that goes with them — while collaborating with the technical teams that own production workflows and enterprise delivery processes.",
+      "description": "Monitoring real-time infra alarms for 18,000+ tower sites on the UOC alarm dashboard. Analysing hourly outage data in Excel (VLOOKUP) to find the worst-hit areas so field teams can prioritise restoration, escalating critical incidents such as fires and major DG faults straight to field team heads, and tracking L1/L2/L3 escalations for landlord and site-access outages through to resolution.",
       "href": null
     },
     {
@@ -23,9 +23,10 @@
         "Next.js",
         "Supabase",
         "three.js",
-        "Zustand"
+        "Zustand",
+        "Tailwind CSS"
       ],
-      "description": "A portfolio e-commerce store for an invented luxury skincare brand: catalog with skin-type and price filters, search, bag and wishlist synced to Supabase for signed-in users, mock checkout with order history and cancellation, and 3D product bottles. Row-level security keeps users out of each other's data. Works as a guest store without Supabase.",
+      "description": "A full-stack e-commerce storefront: filtering, search, cart, wishlist, mock checkout and order history, backed by unit tests. Every order is priced server-side from the catalog so browser-sent prices are ignored, and PostgreSQL row-level security denies direct writes. Guest carts persist in the browser and merge with the saved cart after sign-in. Also fixed a production auth bug that sent confirmation emails to localhost, and added a GitHub Actions keep-alive for the free-tier database.",
       "href": "/velanthe"
     },
     {
@@ -37,9 +38,10 @@
         "Next.js",
         "PostgreSQL",
         "Drizzle",
-        "Auth"
+        "Better Auth",
+        "Playwright"
       ],
-      "description": "A curated link aggregator for frontend, design and Claude Code resources: fuzzy search, an in-app viewer that detects when a site refuses to be framed, captured thumbnails, and an admin dashboard with audit logging. Live on Vercel.",
+      "description": "A curated link platform for frontend, design and developer resources. It detects X-Frame-Options/CSP refusals server-side so permitted sites open in an in-app viewer and blocked ones fall back to a direct-visit screen, generates thumbnails with headless Playwright stored in Vercel Blob, and gates curation behind a Better Auth admin dashboard with super-admin roles, user management and audit logging.",
       "href": "/skillsight"
     },
     {
@@ -51,9 +53,9 @@
         "Go",
         "PostgreSQL",
         "RLS",
-        "Security"
+        "Wire protocol"
       ],
-      "description": "A multi-tenant isolation verifier that synthesises row-level-security policies and diffs captured traffic under them — proving a leak against real PostgreSQL semantics instead of guessing from SQL text. Validated against two real third-party applications, coder and zitadel.",
+      "description": "An open-source Go CLI (v1.0.0) that proves cross-tenant data leaks: captured queries are re-run under a synthesised row-level-security policy and result sets are diffed. Five commands (triage, infer, verify, capture, audit), including a PostgreSQL wire-protocol proxy that records real test-suite traffic, plus oracle self-checks that fail closed. Validated against coder and zitadel, where it helped fix 2 real defects.",
       "href": "/tenantguard"
     },
     {
@@ -66,9 +68,11 @@
         "Argo CD",
         "Helm",
         "Prometheus",
-        "Loki"
+        "Grafana",
+        "Loki",
+        "Trivy"
       ],
-      "description": "A multi-node KIND cluster that reconciles itself from git: Go microservice with Prometheus RED metrics in a minimal non-root image, parameterised Helm chart with ServiceMonitor and an optional HPA, GitHub Actions gating on kubeconform, Helm lint and GHCR publishing, Argo CD with self-healing, and Grafana fed by kube-prometheus-stack plus Loki/Promtail.",
+      "description": "A Go service on a 3-node KIND cluster via a parameterised Helm chart, with GitHub Actions CI (tests, Trivy vulnerability gating, GHCR publishing) and self-healing Argo CD delivery. Observability through Prometheus RED metrics, Grafana dashboards and Promtail/Loki log collection.",
       "href": "/platform"
     },
     {
