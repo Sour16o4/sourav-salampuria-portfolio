@@ -284,7 +284,7 @@
      automatically wherever `backdrop-filter` isn't supported, since the
      opaque `background` below is still declared first. */
   .card {
-    background: linear-gradient(145deg, #ebdab7, #e4d1a9);
+    background: linear-gradient(145deg, #cdb088, #c4a379);
     border: 1px solid rgba(58, 10, 20, 0.24);
     border-radius: var(--radius-card);
     box-shadow: 0 24px 50px rgba(58, 10, 20, 0.42);
@@ -324,11 +324,11 @@
      tokens so a nested diagram can still alternate depth (Topology) the
      way it already did with flat fills. */
   .card-surface {
-    background: linear-gradient(145deg, #ebdab7, #e4d1a9);
+    background: linear-gradient(145deg, #cdb088, #c4a379);
   }
 
   .card-surface-alt {
-    background: linear-gradient(145deg, #e9d8b4, #e0cca4);
+    background: linear-gradient(145deg, #cdb088, #c4a379);
   }
 
   .chip {
@@ -444,7 +444,7 @@
      background's blur through it. */
   .field {
     width: 100%;
-    background: linear-gradient(145deg, #ecdcba, #e5d3ac);
+    background: linear-gradient(145deg, #d2b68e, #c8a97f);
     border: 1px solid rgba(58, 10, 20, 0.2);
     border-radius: var(--radius-chip);
     padding: 12px 14px;
@@ -467,7 +467,7 @@
      but it is the same glass material as the rest of the page — same
      partial-opacity-plus-blur treatment as `.card`, just its own tint. */
   .terminal {
-    background: linear-gradient(145deg, #ead9b5, #e2cfa8);
+    background: linear-gradient(145deg, #d2b68e, #c8a97f);
     border: 1px solid rgba(58, 10, 20, 0.24);
     border-radius: var(--radius-card);
     box-shadow: 0 24px 50px rgba(58, 10, 20, 0.42);
@@ -1066,8 +1066,8 @@
   min-height: 0;
   border: 1px solid rgba(58, 10, 20, 0.16);
   border-radius: 10px;
-  background: linear-gradient(180deg, #e6d3ac 0%, rgba(183, 168, 154, 0.3) 100%);
-  box-shadow: 0 20px 50px rgba(58, 10, 20, 0.10);
+  background: radial-gradient(ellipse 80% 90% at 100% 100%, #bb8f76 0%, rgba(187, 143, 118, 0.55) 35%, rgba(187, 143, 118, 0) 75%), linear-gradient(135deg, #dfc9a2 0%, #d7bf98 100%);
+  box-shadow: 0 28px 70px rgba(58, 10, 20, 0.28);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   padding: 28px clamp(20px, 3vw, 34px) 30px;
