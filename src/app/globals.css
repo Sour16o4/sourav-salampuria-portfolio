@@ -863,9 +863,16 @@
   /* min-, not a fixed height: with the terminal restored, content can be
      taller than one screen on narrow viewports, and forcing it to a fixed
      100svh would have clipped or squeezed it. */
-  min-height: 100svh;
   padding-block: clamp(96px, 12vh, 140px);
   color: #f5f7f8;
+}
+/* Full-screen hero only where the two columns fill it. Stacked on a phone the
+   content is about half a screen, so a forced 100svh left a blank slab under
+   the terminal and before the next section. */
+@media (min-width: 1024px) {
+  .lh-stage {
+    min-height: 100svh;
+  }
 }
 
 .lh-content {
