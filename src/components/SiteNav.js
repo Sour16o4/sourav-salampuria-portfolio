@@ -7,6 +7,9 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 
 import site from '@/content/site.json';
+import timeline from '@/content/timeline.json';
+
+const PROJECT_COUNT = timeline.entries.filter((entry) => entry.href).length;
 
 /**
  * Sticky nav. Blurred translucent ground, mono brand, hamburger below 700px.
@@ -46,12 +49,9 @@ export default function SiteNav() {
       <nav aria-label="Primary" className="container-x flex h-16 items-center justify-between">
         {/* Real hit areas: the text is 13px, so without padding the target is
             17px tall and fails target-size. */}
-        <Link
-          href="/"
-          className="mono -ml-1 inline-flex min-h-[36px] items-center px-1 text-[13px] tracking-tight text-ink"
-        >
-          <span className="text-acc">{'{SS}'}</span>
-          {site.brand}
+        <Link href="/" className="tg-lockup -ml-1 px-1 text-ink" aria-label={`${site.name}, home`}>
+          <span className="tg-lockup-a">{site.name.split(' ')[0]}</span>
+          <span className="tg-lockup-b">{site.name.split(' ').slice(1).join(' ')}</span>
         </Link>
 
         <div className="flex items-center gap-1 min-[700px]:gap-8">
@@ -61,9 +61,11 @@ export default function SiteNav() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="link-quiet mono inline-flex min-h-[36px] items-center text-[12px] tracking-[0.08em]"
+                  aria-current={pathname === item.href ? 'page' : undefined}
+                  className="tg-nav-link link-quiet mono inline-flex min-h-[36px] items-center text-[12px] tracking-[0.08em]"
                 >
                   {item.label}
+                  {item.label === 'Work' ? <sup aria-hidden="true">({String(PROJECT_COUNT).padStart(2, '0')})</sup> : null}
                 </Link>
               </li>
             ))}

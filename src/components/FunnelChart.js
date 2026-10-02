@@ -22,12 +22,12 @@ export default function FunnelChart({ tiers }) {
             className="box-border w-full px-6 py-4 sm:px-7"
             style={{
               width: `${100 - index * 26}%`,
-              background: `rgba(126, 224, 255, ${opacity})`,
-              border: `1px solid rgba(126, 224, 255, ${borderOpacity})`,
+              background: `rgba(90, 20, 36, ${opacity})`,
+              border: `1px solid rgba(90, 20, 36, ${borderOpacity})`,
               borderTop: isFirst ? undefined : 'none',
               borderBottom: isLast ? undefined : 'none',
               borderRadius: isFirst ? '10px 10px 0 0' : isLast ? '0 0 10px 10px' : 0,
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 10px 24px -14px rgba(2,4,5,0.7)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3), 0 10px 24px -14px rgba(58,10,20,0.4)',
             }}
           >
             <div className="mb-1.5 flex items-center gap-2.5">

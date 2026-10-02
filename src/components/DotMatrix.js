@@ -26,15 +26,15 @@ export default function DotMatrix({ value, columns = 10 }) {
             key={cell.id}
             className="aspect-square rounded-[5px]"
             style={{
-              background: 'radial-gradient(circle at 32% 28%, #eafcff 0%, var(--acc) 45%, #1c8fb8 100%)',
-              boxShadow: '0 0 8px rgba(126,224,255,0.6), inset 0 1px 1px rgba(255,255,255,0.6)',
+              background: 'radial-gradient(circle at 32% 28%, #d9b48f 0%, var(--acc) 55%, #3a0a14 100%)',
+              boxShadow: '0 0 8px rgba(90,20,36,0.35), inset 0 1px 1px rgba(255,255,255,0.4)',
             }}
           />
         ) : (
           <div
             key={cell.id}
             className="aspect-square rounded-[5px] border border-faint bg-bg-3"
-            style={{ boxShadow: 'inset 0 1px 2px rgba(2,4,5,0.5)' }}
+            style={{ boxShadow: 'inset 0 1px 2px rgba(58,10,20,0.35)' }}
           />
         )
       )}

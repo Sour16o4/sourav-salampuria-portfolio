@@ -74,8 +74,7 @@ export default function Manifesto({ manifesto }) {
             of the elements inside it. Never the same node twice. */}
         <div ref={headingRef} data-parallax="">
           <Reveal stagger>
-            <p className="micro">002 / thesis</p>
-            <h2 id="manifesto-heading" className="t-h2 mt-5">
+            <h2 id="manifesto-heading" className="t-h2">
               <Stops text={manifesto.heading} />
             </h2>
           </Reveal>

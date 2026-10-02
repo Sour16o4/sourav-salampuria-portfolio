@@ -30,7 +30,7 @@ export default function WorkCard({ entry, reduce, isActive, isDimmed, onHoverSta
   const rotateY = useSpring(useTransform(mx, [0, 1], [-6, 6]), { stiffness: 300, damping: 26 });
   const glowX = useTransform(mx, [0, 1], [0, 100]);
   const glowY = useTransform(my, [0, 1], [0, 100]);
-  const glowBackground = useMotionTemplate`radial-gradient(circle at ${glowX}% ${glowY}%, rgba(126,224,255,0.2), transparent 60%)`;
+  const glowBackground = useMotionTemplate`radial-gradient(circle at ${glowX}% ${glowY}%, rgba(217,180,143,0.2), transparent 60%)`;
 
   function handleMove(event) {
     if (reduce || !ref.current) return;

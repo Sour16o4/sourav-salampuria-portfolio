@@ -1,10 +1,11 @@
 import { Inter } from 'next/font/google';
 
-import LiquidBackground from '@/components/LiquidBackground';
+import TealBackdrop from '@/components/TealBackdrop';
 import PageTransition from '@/components/PageTransition';
 import SiteFooter from '@/components/SiteFooter';
 import SiteNav from '@/components/SiteNav';
 import site from '@/content/site.json';
+import { displayFont } from '@/lib/display-font';
 import './globals.css';
 
 /* Weights 400/500/600 only — never 700+. */
@@ -43,7 +44,7 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: '#0A0A0A',
+  themeColor: '#E2CDA4',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
@@ -64,12 +65,12 @@ const MOTION_GATE = `try{if(window.matchMedia&&!window.matchMedia('(prefers-redu
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${displayFont.variable}`} suppressHydrationWarning>
       <body>
         <script dangerouslySetInnerHTML={{ __html: MOTION_GATE }} />
         {/* EXPERIMENTAL: first in the body, so it paints behind everything
             after it in normal stacking order — no z-index tricks needed. */}
-        <LiquidBackground />
+        <TealBackdrop />
         <a className="skip-link" href="#main">
           Skip to content
         </a>

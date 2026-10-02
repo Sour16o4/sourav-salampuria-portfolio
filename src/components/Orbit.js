@@ -15,16 +15,22 @@ import SkillsChart from '@/components/SkillsChart';
  * SkillsChart below it is the only client-side piece here — a bar chart of
  * real tool counts per terminal group, not a second decorative marquee.
  */
+/* Brand colours that are too dark to read on the dark tiles (Helm's navy, the
+   Postgres blue) are mixed toward the latte so every logo stays visible. */
+function tileColor(icon) {
+  if (icon.mono) return '#f1e3c8';
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(icon.hex.slice(i, i + 2), 16) / 255);
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return luminance < 0.24 ? `color-mix(in srgb, ${icon.hex} 40%, #f1e3c8)` : icon.hex;
+}
+
 export default function Orbit({ orbit, stack }) {
   const doubled = [...icons, ...icons];
 
   return (
     <section className="section-y" aria-labelledby="stack-heading">
       <div className="container-x">
-        <p id="stack-heading" className="micro">
-          <span className="text-acc">/</span> stack
-        </p>
-        <h2 className="t-h3 mt-5 max-w-[30ch] text-[clamp(22px,2.6vw,30px)]">
+        <h2 id="stack-heading" className="t-h2 max-w-[16ch]">
           {orbit.heading}
           <span className="text-acc">.</span>
         </h2>
@@ -36,13 +42,16 @@ export default function Orbit({ orbit, stack }) {
               <span
                 key={`${icon.label}-${index}`}
                 aria-hidden={index >= icons.length}
-                className="stack-marquee-icon"
+                className="stack-marquee-item"
                 title={icon.label}
-                style={{ '--brand': icon.mono ? 'var(--ink)' : icon.hex }}
+                style={{ '--brand': tileColor(icon) }}
               >
-                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                  <path d={icon.path} fill="currentColor" />
-                </svg>
+                <span className="stack-marquee-icon">
+                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path d={icon.path} fill="currentColor" />
+                  </svg>
+                </span>
+                <span className="stack-marquee-label">{icon.label}</span>
               </span>
             ))}
           </div>

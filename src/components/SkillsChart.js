@@ -22,6 +22,7 @@ export default function SkillsChart({ groups }) {
 
   const rows = groups.map((group) => ({
     key: group.key,
+    tools: group.value.split('·').map((tool) => tool.trim()),
     count: group.value.split('·').length,
   }));
   const max = Math.max(...rows.map((row) => row.count));
@@ -88,28 +89,37 @@ export default function SkillsChart({ groups }) {
   }, []);
 
   return (
-    <div ref={rootRef} className="card mt-12 p-6 sm:p-8">
-      <p className="micro">/ stack, by weight</p>
-      <div className="mt-5 flex flex-col gap-4">
+    <div ref={rootRef} className="mt-12 py-2">
+      <p className="text-[13px] font-semibold text-mute">Stack, by weight</p>
+      <div className="mt-5 flex flex-col gap-5">
         {rows.map((row) => (
-          <div key={row.key} className="flex items-center gap-4">
-            <span className="mono w-20 shrink-0 text-[13px] text-mute">{row.key}</span>
-            <div
-              className="h-[10px] flex-grow overflow-hidden rounded-full bg-bg-3"
-              style={{ boxShadow: 'inset 0 2px 4px rgba(2,4,5,0.6)' }}
-            >
+          <div key={row.key} className="grid gap-x-4 gap-y-2 sm:grid-cols-[5rem_minmax(0,1fr)_1.5rem] sm:items-center">
+            <span className="text-[14px] font-medium text-mute">{row.key}</span>
+            <div className="min-w-0">
+              <ul className="m-0 mb-2 flex list-none flex-wrap gap-1.5 p-0">
+                {row.tools.map((tool) => (
+                  <li key={tool} className="stack-tool">
+                    {tool}
+                  </li>
+                ))}
+              </ul>
               <div
-                data-fill
-                data-target={`${(row.count / max) * 100}%`}
-                className="h-full rounded-full"
-                style={{
-                  width: 0,
-                  background: 'linear-gradient(90deg, #2f9bc2 0%, var(--acc) 70%, #eafcff 100%)',
-                  boxShadow: '0 0 14px rgba(126,224,255,0.5)',
-                }}
-              />
+                className="h-[8px] w-full overflow-hidden rounded-full bg-bg-3"
+                style={{ boxShadow: 'inset 0 2px 4px rgba(58,10,20,0.3)' }}
+              >
+                <div
+                  data-fill
+                  data-target={`${(row.count / max) * 100}%`}
+                  className="h-full rounded-full"
+                  style={{
+                    width: 0,
+                    background: 'linear-gradient(90deg, #b98a62 0%, #7a2233 70%, #3a0a14 100%)',
+                    boxShadow: '0 0 14px rgba(217,180,143,0.5)',
+                  }}
+                />
+              </div>
             </div>
-            <span className="mono w-6 shrink-0 text-right text-[15px] font-semibold text-ink">{row.count}</span>
+            <span className="hidden text-right text-[15px] font-semibold text-ink sm:block">{row.count}</span>
           </div>
         ))}
       </div>

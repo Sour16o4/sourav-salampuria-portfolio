@@ -85,8 +85,7 @@ export default function ContactForm({ contact }) {
     <section id="contact" className="section-y" aria-labelledby="contact-heading">
       <div className="container-x grid gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] lg:gap-20">
         <Reveal as="div" stagger>
-          <p className="micro">{contact.label}</p>
-          <h2 id="contact-heading" className="t-h2 mt-5">
+          <h2 id="contact-heading" className="t-h2">
             <Stops text={contact.heading} />
           </h2>
           <p className="t-body mt-6 max-w-[42ch]">{contact.lead}</p>

@@ -6,6 +6,7 @@ import DotMatrix from '@/components/DotMatrix';
 import FlowDiagram from '@/components/FlowDiagram';
 import FunnelChart from '@/components/FunnelChart';
 import ReadingProgress from '@/components/ReadingProgress';
+import Sheet from '@/components/Sheet';
 import Topology from '@/components/Topology';
 import Reveal from '@/components/Reveal';
 import site from '@/content/site.json';
@@ -30,7 +31,8 @@ export default function ChapterArticle({ doc }) {
 
       <main id="main">
         <article id="article" className="pb-24">
-          <header className="container-x pt-12 sm:pt-16">
+          <Sheet ghost={doc.title.split(' ')[0].toUpperCase()} label={doc.title} tight>
+          <header>
             <p>
               <Link className="link-quiet mono inline-flex items-center gap-1.5 text-[12px]" href="/">
                 <ArrowLeft size={14} strokeWidth={1.5} aria-hidden="true" />
@@ -40,7 +42,7 @@ export default function ChapterArticle({ doc }) {
 
             <p className="micro mt-10">{doc.kicker}</p>
 
-            <h1 className="t-h2 mt-5 max-w-[20ch]">
+            <h1 className="t-h2 mt-5 max-w-[14ch]">
               <Stops text={doc.title} />
             </h1>
 
@@ -100,6 +102,7 @@ export default function ChapterArticle({ doc }) {
               </p>
             ) : null}
           </header>
+          </Sheet>
 
           {doc.gallery?.length ? (
             <Reveal
@@ -112,7 +115,7 @@ export default function ChapterArticle({ doc }) {
                 return (
                   <figure
                     key={shot.src}
-                    className={`card overflow-hidden p-0 ${shot.span === 'full' ? 'sm:col-span-2' : ''}`}
+                    className={`card tg-tilt overflow-hidden p-0 ${shot.span === 'full' ? 'sm:col-span-2' : ''}`}
                   >
                     <Image
                       src={shot.src}
@@ -146,7 +149,7 @@ export default function ChapterArticle({ doc }) {
                   {String(index + 1).padStart(2, '0')}
                 </p>
 
-                <h2 className="t-h3 mt-3 text-[clamp(22px,2.6vw,30px)]">{chapter.title}</h2>
+                <h2 className="tg-title mt-3">{chapter.title}</h2>
 
                 <div className="mt-6 space-y-5">
                   {chapter.paragraphs.map((paragraph) =>
@@ -199,7 +202,7 @@ export default function ChapterArticle({ doc }) {
 
             {doc.differently ? (
               <section className="mt-24 max-w-[70ch] pt-12">
-                <h2 className="t-h3 text-[clamp(22px,2.6vw,30px)]">
+                <h2 className="tg-title">
                   <Stops text={doc.differently.title} />
                 </h2>
                 <ul className="m-0 mt-8 list-none space-y-5 p-0">

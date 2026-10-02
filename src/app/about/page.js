@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
 import Reveal from '@/components/Reveal';
+import Sheet from '@/components/Sheet';
 import about from '@/content/about.json';
 import site from '@/content/site.json';
 import { Stops } from '@/lib/stops';
@@ -15,7 +16,8 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <main id="main">
-      <article className="container-x pt-12 pb-24 sm:pt-16">
+      <article className="pb-24">
+        <Sheet ghost="ABOUT" label="About" tight>
         <p>
           <Link className="link-quiet mono inline-flex items-center gap-1.5 text-[12px]" href="/">
             <ArrowLeft size={14} strokeWidth={1.5} aria-hidden="true" />
@@ -32,7 +34,9 @@ export default function AboutPage() {
 
           <p className="t-lead mt-6 max-w-[62ch]">{about.lead}</p>
         </Reveal>
+        </Sheet>
 
+        <div className="container-x">
         <Reveal stagger className="mt-10 max-w-[66ch] space-y-5">
           {about.paragraphs.map((paragraph) => (
             <p key={paragraph.slice(0, 32)} className="t-body">
@@ -91,6 +95,7 @@ export default function AboutPage() {
               </Link>
             </li>
           </ul>
+        </div>
         </div>
       </article>
     </main>
